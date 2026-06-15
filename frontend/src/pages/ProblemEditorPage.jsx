@@ -133,8 +133,9 @@ function ProblemEditorPage() {
             const { data } = await axios.post(`${CODE_API}/run`, {
                 code, language: language.label, problemId: Number(id), input: '', timeLimit: 5000,
             });
-            setOutput({ type: 'run', ...data });
-            data.status === 'OK' ? toast.success('Ran successfully') : toast.error(data.status);
+            const payload = data.data || data;
+            setOutput({ type: 'run', ...payload });
+            payload.failed_test_cases === 0 ? toast.success('Sample tests passed! 🎉') : toast.error('Some sample tests failed');
         } catch {
             toast.error('Execution failed');
             setOutput({ type: 'error', message: 'Execution service unavailable' });
@@ -150,10 +151,11 @@ function ProblemEditorPage() {
             const { data } = await axios.post(`${CODE_API}/submit`, {
                 code, language: language.label, problemId: id,
             });
-            setOutput({ type: 'submit', ...data });
-            data.status === 'ACCEPTED'
+            const payload = data.data || data;
+            setOutput({ type: 'submit', ...payload });
+            payload.status === 'ACCEPTED'
                 ? toast.success('All tests passed! 🎉')
-                : toast.error(`${data.passed_test_cases ?? 0}/${data.total_test_cases ?? 0} passed`);
+                : toast.error(`${payload.passed_test_cases ?? 0}/${payload.total_test_cases ?? 0} passed`);
         } catch {
             toast.error('Submission failed');
         } finally { setSubmitting(false); }
@@ -404,40 +406,17 @@ function OutputPanel({ output, executing, submitting }) {
         );
     }
 
-    if (output.type === 'run') {
-        const ok = output.status === 'OK';
-        return (
-            <div className="p-6 space-y-4">
-                <div className={`rounded-lg px-4 py-3 text-sm font-semibold ${ok ? 'bg-emerald-900/50 text-emerald-300' : 'bg-red-900/50 text-red-300'}`}>
-                    {ok ? '✓ Execution Successful' : `✗ ${output.status}`}
-                </div>
-                {output.stdout && (
-                    <div>
-                        <p className="mb-1.5 text-xs text-slate-400 font-semibold uppercase tracking-wider">Stdout</p>
-                        <pre className="rounded-lg bg-slate-900 p-4 text-xs font-mono text-slate-300 overflow-x-auto whitespace-pre-wrap">{output.stdout}</pre>
-                    </div>
-                )}
-                {output.stderr && (
-                    <div>
-                        <p className="mb-1.5 text-xs text-slate-400 font-semibold uppercase tracking-wider">Stderr</p>
-                        <pre className="rounded-lg bg-slate-900 p-4 text-xs font-mono text-red-400 overflow-x-auto whitespace-pre-wrap">{output.stderr}</pre>
-                    </div>
-                )}
-                <p className="text-xs text-slate-500">Time: {output.execution_time_ms ?? 0}ms</p>
-            </div>
-        );
-    }
-
-    if (output.type === 'submit') {
-        const accepted = output.status === 'ACCEPTED';
+    if (output.type === 'run' || output.type === 'submit') {
+        const accepted = output.failed_test_cases === 0 && output.passed_test_cases > 0;
         const passed   = output.passed_test_cases ?? 0;
         const total    = output.total_test_cases ?? 0;
         const pct      = total > 0 ? Math.round((passed / total) * 100) : 0;
+        
         return (
-            <div className="p-6 flex flex-col items-center justify-center gap-6 h-full">
-                <div className={`w-full rounded-xl p-6 text-center ${accepted ? 'bg-emerald-900/30 ring-1 ring-emerald-500/30' : 'bg-amber-900/20 ring-1 ring-amber-500/30'}`}>
+            <div className="p-6 flex flex-col gap-6 h-full overflow-y-auto">
+                <div className={`w-full flex-shrink-0 rounded-xl p-6 text-center ${accepted ? 'bg-emerald-900/30 ring-1 ring-emerald-500/30' : 'bg-amber-900/20 ring-1 ring-amber-500/30'}`}>
                     <p className={`text-2xl font-bold ${accepted ? 'text-emerald-300' : 'text-amber-300'}`}>
-                        {accepted ? '✓ Accepted' : '✗ Wrong Answer'}
+                        {accepted ? '✓ ' + (output.type === 'submit' ? 'Accepted' : 'Sample Tests Passed') : '✗ Wrong Answer'}
                     </p>
                     <p className="mt-1 text-sm text-slate-400">
                         {passed} / {total} test cases passed
@@ -449,8 +428,41 @@ function OutputPanel({ output, executing, submitting }) {
                             style={{ width: `${pct}%` }}
                         />
                     </div>
-                    <p className="mt-1 text-xs text-slate-500">{pct}% accuracy</p>
                 </div>
+
+                {/* Individual Test Results */}
+                {output.test_results?.length > 0 && (
+                    <div className="space-y-4 pb-12">
+                        <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-3">Test Cases</h3>
+                        {output.test_results.map((tr, idx) => (
+                            <div key={idx} className={`rounded-lg p-4 border ${tr.status === 'PASSED' ? 'border-emerald-800/50 bg-emerald-900/10' : 'border-red-800/50 bg-red-900/10'}`}>
+                                <p className={`text-sm font-semibold mb-3 flex justify-between ${tr.status === 'PASSED' ? 'text-emerald-400' : 'text-red-400'}`}>
+                                    <span>Test Case {idx + 1} {tr.status === 'PASSED' ? '✓' : '✗'}</span>
+                                    <span className="text-xs opacity-70 font-normal">{tr.execution_time_ms}ms</span>
+                                </p>
+                                <div className="grid grid-cols-2 gap-4">
+                                    {tr.error_message ? (
+                                        <div className="col-span-2">
+                                            <p className="text-xs text-slate-500 mb-1">Error</p>
+                                            <pre className="text-xs text-red-300 bg-black/40 p-3 rounded-lg overflow-x-auto">{tr.error_message}</pre>
+                                        </div>
+                                    ) : (
+                                        <>
+                                            <div className="col-span-2 lg:col-span-1">
+                                                <p className="text-xs text-slate-500 mb-1">Expected Output</p>
+                                                <pre className="text-xs text-slate-300 bg-black/40 p-3 rounded-lg whitespace-pre-wrap overflow-x-auto">{tr.expected_output}</pre>
+                                            </div>
+                                            <div className="col-span-2 lg:col-span-1">
+                                                <p className="text-xs text-slate-500 mb-1">Actual Output</p>
+                                                <pre className="text-xs text-slate-300 bg-black/40 p-3 rounded-lg whitespace-pre-wrap overflow-x-auto">{tr.actual_output}</pre>
+                                            </div>
+                                        </>
+                                    )}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                )}
             </div>
         );
     }
