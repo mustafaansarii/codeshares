@@ -7,10 +7,7 @@ export default function AuthLayout({ badge, title, description, features = [], b
     return (
         <div className="flex min-h-screen w-full">
 
-            <div
-                className="hidden lg:flex flex-col w-1/2 bg-cover bg-center text-white relative overflow-hidden"
-                style={{ backgroundImage: "url('/assest/home_page.png')" }}
-            >
+            <div className="hidden lg:flex flex-col w-1/2 text-white relative overflow-hidden bg-gradient-to-br from-slate-900 to-slate-800">
 
                 <div className="absolute inset-0 bg-gradient-to-br from-black/75 via-black/55 to-black/30 pointer-events-none hidden dark:block" />
 
@@ -91,10 +88,7 @@ export default function AuthLayout({ badge, title, description, features = [], b
 
             <div className="flex flex-1 flex-col">
 
-                <header
-                    className="lg:hidden border-b border-white/20 shrink-0 bg-cover bg-center"
-                    style={{ backgroundImage: "url('/assest/home_page.png')" }}
-                >
+                <header className="lg:hidden border-b border-slate-400 shrink-0 bg-slate-50">
                     <div className="flex h-14 items-center justify-between px-4">
                         <button onClick={() => navigate('/')} className="group flex items-center outline-none">
                             <BrandLogo height={32} />

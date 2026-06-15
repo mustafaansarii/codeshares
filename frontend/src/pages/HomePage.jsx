@@ -5,14 +5,11 @@ import HomeSections from '../components/homePage/HomeSections';
 function HomePage() {
     return (
         <>
-            <div
-                className="relative w-full overflow-hidden bg-top bg-no-repeat home-page-hero-bg border-b border-white"
-                style={{
-                    backgroundImage: "url('/assest/home_page.png')",
-                }}
-            >
+            <div className="relative w-full overflow-hidden border-b-2 border-black">
                 <Navbar />
-                <Hero />
+                <div className="mx-4 sm:mx-6 lg:mx-8 border-l-2 border-r-2 border-black">
+                    <Hero />
+                </div>
             </div>
             <HomeSections />
         </>

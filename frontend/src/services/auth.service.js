@@ -1,7 +1,7 @@
 import axios from 'axios';
 import toast from 'react-hot-toast';
 
-const API_URL = '/careerhub/api/auth/';
+const API_URL = '/codeshare/api/auth/';
 
 const axiosInstance = axios.create({
     baseURL: API_URL,
@@ -49,7 +49,7 @@ class AuthService {
     }
 
     loginWithProvider(provider) {
-        window.location.href = `/careerhub/oauth2/authorization/${provider}`;
+        window.location.href = `/codeshare/oauth2/authorization/${provider}`;
     }
 
     async verifyAuth() {

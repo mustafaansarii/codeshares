@@ -16,24 +16,19 @@ export default function Footer() {
     };
 
     return (
-        <footer className="border-t border-white/50">
-            <div
-                className="relative w-full overflow-hidden bg-top bg-no-repeat home-page-hero-bg border-b border-white/50"
-                style={{
-                    backgroundImage: "url('/assest/home_page.png')",
-                }}
-            >
+        <footer className="border-t-2 border-black">
+            <div className="relative w-full overflow-hidden border-b-2 border-black bg-white">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
                 <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
                     <div className="space-y-3 col-span-2 md:col-span-1">
                         <Link to="/" className="flex items-center">
                             <BrandLogo height={34} />
                         </Link>
-                    <p className="text-sm sm:text-slate-300 text-slate-900 max-w-xs">
-                            Build ATS-friendly resumes and documents in minutes.
+                    <p className="text-sm text-slate-600 max-w-xs">
+                            Practice DSA problems and share code solutions instantly with your team.
                         </p>
                         <p className="hidden text-sm text-slate-400 md:block">
-                            © {new Date().getFullYear()} CareerHub. All rights reserved.
+                            © {new Date().getFullYear()} CodeShare. All rights reserved.
                         </p>
                     </div>
 
@@ -60,7 +55,7 @@ export default function Footer() {
                     ))}
                 </div>
                 <p className="mt-4 -mb-8 text-center text-sm text-slate-400 md:hidden">
-                    © {new Date().getFullYear()} CareerHub. All rights reserved.
+                    © {new Date().getFullYear()} CodeShare. All rights reserved.
                 </p>
             </div>
             </div>

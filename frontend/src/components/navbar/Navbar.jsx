@@ -1,32 +1,18 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import { MdDescription, MdDashboard, MdFolder, MdMail, MdKeyboardArrowDown } from 'react-icons/md';
 import authService from '../../services/auth.service';
 import BrandLogo from '../shared/BrandLogo';
 
 const iconBase = 'h-5 w-5';
-const DocIcon = () => (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className={iconBase}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M9 13h6m-6 4h4m3 4H8a2 2 0 01-2-2V5a2 2 0 012-2h6l4 4v12a2 2 0 01-2 2z" />
-    </svg>
-);
-const GridIcon = () => (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className={iconBase}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M4 5h6v6H4V5zm10 0h6v6h-6V5zM4 15h6v4H4v-4zm10 0h6v4h-6v-4z" />
-    </svg>
-);
-const FolderIcon = () => (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className={iconBase}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V7z" />
-    </svg>
-);
-const MailIcon = () => (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className={iconBase}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16v12H4V6zm0 1l8 6 8-6" />
-    </svg>
-);
 
-const ICONS = { builder: <DocIcon />, grid: <GridIcon />, folder: <FolderIcon />, mail: <MailIcon /> };
+const ICONS = {
+  builder: <MdDescription className={iconBase} />,
+  grid: <MdDashboard className={iconBase} />,
+  folder: <MdFolder className={iconBase} />,
+  mail: <MdMail className={iconBase} />
+};
 
 const navItems = [
     { label: 'Home', to: '/' },
@@ -43,12 +29,9 @@ function megaLinks(item) {
 
 function ChevronDown({ open }) {
     return (
-        <svg
-            className={`h-3.5 w-3.5 transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
-            viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"
-        >
-            <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-        </svg>
+        <MdKeyboardArrowDown
+            className={`h-5 w-5 transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
+        />
     );
 }
 
@@ -93,7 +76,7 @@ function DropdownNavItem({ item, isOpen, onOpen, onCloseSelf, onClose }) {
                 ref={btnRef}
                 type="button"
                 onClick={() => (isOpen ? onCloseSelf() : enter())}
-                className={`flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-medium transition-colors duration-200 ${isOpen ? 'bg-white/10 text-white' : 'text-white/85 hover:bg-white/10 hover:text-white'}`}
+                className={`flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-medium transition-colors duration-200 ${isOpen ? 'bg-slate-100 text-slate-900' : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900'}`}
             >
                 {item.label}
                 <ChevronDown open={isOpen} />
@@ -176,7 +159,7 @@ function MegaPromo({ promo, onClose }) {
 
 function MegaPanel({ mega, onClose }) {
     return (
-        <div className="mx-auto w-fit max-w-full overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-2xl shadow-slate-900/10 ring-1 ring-black/5">
+        <div className="mx-auto w-fit max-w-full overflow-hidden rounded-2xl border border-2 border-black bg-white shadow-2xl shadow-slate-900/10 ring-1 ring-black/5">
             <div className="flex flex-col gap-6 p-6 lg:flex-row">
                 <div className="flex flex-col gap-x-6 gap-y-4 sm:flex-row">
                     {mega.columns.map((col, i) => (
@@ -221,7 +204,7 @@ function NavCenter({ visibleNavItems }) {
                         to={item.to}
                         onClick={closeAll}
                         className={({ isActive }) =>
-                            `rounded-lg px-3 py-2 text-sm font-medium transition-colors duration-200 ${isActive ? 'bg-white/10 text-white' : 'text-white/85 hover:bg-white/10 hover:text-white'}`
+                            `rounded-lg px-3 py-2 text-sm font-medium transition-colors duration-200 ${isActive ? 'bg-slate-100 text-slate-900' : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900'}`
                         }
                     >
                         {item.label}
@@ -266,7 +249,7 @@ function ProfileMenu({ onLogout }) {
             <button
                 ref={btnRef}
                 onClick={() => setOpen((v) => !v)}
-                className="group relative flex h-9 w-9 items-center justify-center rounded-full border border-white/40 bg-white/10 text-white backdrop-blur-sm transition hover:border-white/70 hover:bg-white/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
+                className="group relative flex h-9 w-9 items-center justify-center rounded-full border border-2 border-black bg-slate-100 text-slate-900 backdrop-blur-sm transition hover:border-2 border-black hover:bg-slate-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500/60"
                 aria-label="Profile menu"
             >
                 <svg viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5 opacity-90 transition-opacity group-hover:opacity-100">
@@ -274,7 +257,7 @@ function ProfileMenu({ onLogout }) {
                 </svg>
                 <span className="absolute -bottom-0.5 -right-0.5 flex h-2.5 w-2.5">
                     <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-teal-400 opacity-50" />
-                    <span className="relative inline-flex h-2.5 w-2.5 rounded-full border border-white bg-teal-500" />
+                    <span className="relative inline-flex h-2.5 w-2.5 rounded-full border border-2 border-black bg-teal-500" />
                 </span>
             </button>
 
@@ -282,8 +265,8 @@ function ProfileMenu({ onLogout }) {
                 style={{ position: 'fixed', top: pos.top, right: pos.right, width: '13rem', zIndex: 99999, transform: `translateY(${open ? '0px' : '-6px'})` }}
                 className={`transition-[opacity,transform] duration-200 ${open ? 'opacity-100' : 'pointer-events-none opacity-0'}`}
             >
-                <div className="overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-xl shadow-slate-900/10 ring-1 ring-black/5">
-                    <div className="border-b border-slate-100 px-4 py-3">
+                <div className="overflow-hidden rounded-2xl border border-2 border-black bg-white shadow-xl shadow-slate-900/10 ring-1 ring-black/5">
+                    <div className="border-b border-2 border-black px-4 py-3">
                         <p className="text-[11px] font-semibold uppercase tracking-widest text-slate-400">Account</p>
                     </div>
                     <div className="space-y-0.5 p-2">
@@ -300,7 +283,7 @@ function ProfileMenu({ onLogout }) {
                             </NavLink>
                         ))}
                     </div>
-                    <div className="border-t border-slate-100 p-2">
+                    <div className="border-t border-2 border-black p-2">
                         <button
                             onClick={() => { setOpen(false); onLogout(); }}
                             className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm font-medium text-red-500 transition-colors hover:bg-red-50"
@@ -325,7 +308,7 @@ function MobileMenu({ visibleNavItems, isAuthenticated, profileItems, onLogout, 
         <div
             ref={menuRef}
             style={{ top: menuTop }}
-            className="fixed left-0 right-0 z-[9999] border-b border-slate-200 bg-white shadow-xl md:hidden"
+            className="fixed left-0 right-0 z-[9999] border-b-2 border-black shadow-xl md:hidden"
         >
             <div className="max-h-[72vh] space-y-0.5 overflow-y-auto px-3 py-3">
                 {visibleNavItems.map((item) =>
@@ -339,7 +322,7 @@ function MobileMenu({ visibleNavItems, isAuthenticated, profileItems, onLogout, 
                                 <ChevronDown open={openSection === item.label} />
                             </button>
                             {openSection === item.label && (
-                                <div className="mb-1 ml-2 space-y-0.5 border-l-2 border-slate-100 pl-3">
+                                <div className="mb-1 ml-2 space-y-0.5 border-l-2 border-2 border-black pl-3">
                                     {megaLinks(item).map((child) => (
                                         <NavLink
                                             key={child.to + child.label}
@@ -368,7 +351,7 @@ function MobileMenu({ visibleNavItems, isAuthenticated, profileItems, onLogout, 
                 )}
             </div>
 
-            <div className="border-t border-slate-200 px-3 py-3">
+            <div className="border-t border-2 border-black px-3 py-3">
                 {isAuthenticated ? (
                     <div className="space-y-0.5">
                         {profileItems.map((item) => (
@@ -382,7 +365,7 @@ function MobileMenu({ visibleNavItems, isAuthenticated, profileItems, onLogout, 
                     </div>
                 ) : (
                     <div className="flex flex-col gap-2">
-                        <NavLink to="/login" className="block w-full rounded-full border border-slate-300 px-3 py-2.5 text-center text-sm font-semibold text-slate-800 hover:bg-slate-50">
+                        <NavLink to="/login" className="block w-full rounded-full border border-2 border-black px-3 py-2.5 text-center text-sm font-semibold text-slate-800 hover:bg-slate-50">
                             Sign in
                         </NavLink>
                     </div>
@@ -451,13 +434,15 @@ export default function Navbar() {
     return (
         <header
             ref={headerRef}
-            className="relative z-50 border-b border-white bg-gradient-to-b from-slate-950/45 via-slate-950/15 to-transparent text-white"
+            className="relative z-50 border-b-2 border-black text-slate-900"
         >
             <nav className="mx-auto flex h-16 max-w-7xl items-center px-4 sm:px-6 lg:px-8">
 
                 <div className="flex flex-1 items-center">
-                    <button onClick={() => navigate('/')} className="group flex items-center outline-none">
-                        <BrandLogo height={34} className="transition-opacity group-hover:opacity-90" />
+                    <button onClick={() => navigate('/')} className="group flex items-center gap-3 outline-none px-3 py-2 rounded-lg transition-all hover:bg-slate-100">
+                        <div className="flex items-center gap-2.5">
+                            <BrandLogo height={28} className="transition-all" />
+                        </div>
                     </button>
                 </div>
 
@@ -472,7 +457,7 @@ export default function Navbar() {
                         <div className="hidden items-center gap-1.5 md:flex">
                             <NavLink
                                 to="/login"
-                                className="inline-flex items-center gap-1.5 rounded-full border-2 border-teal-400 px-5 py-2 text-sm font-semibold text-white transition hover:bg-teal-400/10"
+                                className="inline-flex items-center gap-1.5 rounded-full border-2 border-teal-400 px-5 py-2 text-sm font-semibold text-teal-600 transition hover:bg-teal-400/10"
                             >
                                 Sign in
                             </NavLink>

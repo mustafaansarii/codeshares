@@ -57,7 +57,7 @@ export default function BrandLogo({ height = 60, className = "" }) {
         />
       </g>
 
-      {/* CareerHub Text */}
+      {/* CodeShare Text */}
       <text
         x="170"
         y="145"
@@ -67,7 +67,7 @@ export default function BrandLogo({ height = 60, className = "" }) {
         letterSpacing="-2"
         fill="currentColor"
       >
-        CareerHub
+        CodeShare
       </text>
     </svg>
   );

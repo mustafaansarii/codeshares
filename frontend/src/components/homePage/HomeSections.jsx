@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { MdArrowForward, MdStar } from 'react-icons/md';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 
@@ -33,16 +34,16 @@ const ATS_PILLS = [
 ];
 
 const STEPS = [
-    { n: '01', title: 'Pick a template', desc: 'Choose from polished, ATS-ready designs for resumes, cover letters and more.' },
-    { n: '02', title: 'Make it yours', desc: 'Edit content in the live editor — the PDF preview updates as you type.' },
-    { n: '03', title: 'Download & apply', desc: 'Export a pixel-perfect PDF and save it to your account for later edits.' },
+    { n: '01', title: 'Browse DSA Sheets', desc: 'Explore curated Data Structures & Algorithms problem sheets organized by difficulty and topics.' },
+    { n: '02', title: 'Create & Code', desc: 'Solve problems and create solution files with syntax highlighting and real-time preview.' },
+    { n: '03', title: 'Share & Collaborate', desc: 'Generate shareable links for your code files and collaborate with peers for reviews and learning.' },
 ];
 
 const TEMPLATES = [
-    { src: 'https://i.ibb.co/v4dWrK1j/Vishnu-Singh.jpg', name: 'Modern Tech', tag: 'Resume', to: '/login' },
-    { src: 'http://raw.githubusercontent.com/jakegut/resume/refs/heads/master/resume.png', name: 'Classic Professional', tag: 'Resume', to: '/login' },
-    { src: 'https://i.ibb.co/7HgSdbL/William-Lucas.jpg', name: 'Engineering Pro', tag: 'Resume', to: '/login' },
-    { src: 'https://cdn.enhancv.com/images/1098/i/aHR0cHM6Ly9jZG4uZW5oYW5jdi5jb20vcHJlZGVmaW5lZC1leGFtcGxlcy9vU0ZjUElJdk1rVUhzT2xQQ0gwU3NLRUF0aVprd0N6Q2xPTFRFUFJmL2ltYWdlLnBuZw~~.png', name: 'Enhancv Style', tag: 'Resume', to: '/login' },
+    { name: 'Arrays & Strings', tag: 'DSA Sheet', to: '/login' },
+    { name: 'Trees & Graphs', tag: 'DSA Sheet', to: '/login' },
+    { name: 'Dynamic Programming', tag: 'DSA Sheet', to: '/login' },
+    { name: 'Sorting & Searching', tag: 'DSA Sheet', to: '/login' },
 ];
 
 const REVIEWS = [
@@ -55,33 +56,30 @@ const REVIEWS = [
 ];
 
 const FAQS = [
-    { q: 'Is CareerHub free to use?', a: 'Yes. You can build a resume, fill in your details, and download a PDF for free — no payment required to get a finished, recruiter-ready document.' },
-    { q: 'Do I need an account to build a resume?', a: 'No. You can open the resume builder and download a PDF without signing in. Creating an account simply lets us save your details and reuse them next time.' },
-    { q: 'What is the difference between the form editor and the LaTeX editor?', a: 'The form editor is the default — you fill in structured fields and see a live preview, no coding needed. The LaTeX editor is for advanced users who want to tweak the raw LaTeX of the same template. Use the ⋯ menu on any template to switch.' },
-    { q: 'Are CareerHub resumes ATS-friendly?', a: 'Yes. Every template uses clean, single-column-friendly layouts with standard section headings and readable fonts, so applicant tracking systems can parse your name, experience, and skills without dropping content.' },
-    { q: 'How do I download my resume as a PDF?', a: 'Click “Download PDF” in the builder. It produces a crisp, multi-page US-Letter PDF with proper margins — page breaks fall between sections so nothing gets cut in half.' },
-    { q: 'Can I edit my resume after I have started?', a: 'Of course. Edit any field inline, drag headings to reorder sections, add or remove sections, and re-download anytime. If you are signed in, your edits are saved back to your account on download.' },
-    { q: 'Will my saved details pre-fill the builder?', a: 'Yes. Once you add your details under Profile → Resume details, every template you open is automatically pre-filled with your information. If you have not added anything yet, the form shows example content you can replace.' },
-    { q: 'Can I switch templates without re-typing everything?', a: 'Yes. Your information lives in one place and flows into whichever template you pick, so changing the design never means re-entering your experience, education, or skills.' },
-    { q: 'How do I sign in or create an account?', a: 'Use your email and password, or continue with Google or GitHub. If you sign in with a social account for the first time, an account is created for you automatically.' },
-    { q: 'Can I add sections like Projects, Certifications, or Awards?', a: 'Yes. Use “Add section” at the bottom of the builder to add Projects, Certifications, Achievements, Awards, Languages, Volunteering, Publications, and more — then reorder them by dragging the headings.' }
+    { q: 'Is CodeShare free to use?', a: 'Yes. You can practice DSA problems, create solution files, and share code with anyone completely free — no payment required.' },
+    { q: 'Do I need an account to practice DSA?', a: 'You can browse problems without an account, but creating an account lets you save your progress, track solutions, and generate shareable links for your code.' },
+    { q: 'Can I share my solutions with others?', a: 'Yes! Create a solution file for any problem and generate a shareable link. You can send it to teammates, friends, or instructors for feedback and collaboration.' },
+    { q: 'How secure is CodeShare?', a: 'CodeShare uses end-to-end encryption for all code shares. Your shared links are secure and can be revoked anytime — only people with the link can access your code.' },
+    { q: 'What programming languages are supported?', a: 'CodeShare supports all major programming languages including Python, Java, C++, JavaScript, Go, Rust, and many more — with syntax highlighting for each.' },
+    { q: 'Can I edit my shared code after sharing?', a: 'Yes! When you share a file, you retain full edit access. Changes are reflected in real-time for anyone viewing the shared link.' },
+    { q: 'Can I create my own problems and sheets?', a: 'Currently, CodeShare provides curated DSA sheets. You can solve and share your solutions. Custom problem creation is coming soon!' },
+    { q: 'How do I track my progress?', a: 'Your account dashboard shows all problems you have solved, solutions saved, and sharing history — helping you visualize your learning journey.' },
+    { q: 'How do I sign in or create an account?', a: 'You can sign in with Google or GitHub for instant account creation. No passwords to remember — just secure OAuth authentication.' },
+    { q: 'Can I download my solutions?', a: 'Yes. Download any solution file as plain code or with formatting. Export multiple solutions at once from your dashboard.' }
 ];
 
 function FaqItem({ item, isOpen, onToggle }) {
     return (
-        <div className="rounded-2xl border border-black/10 bg-white transition hover:border-teal-300 dark:border-white/10 dark:bg-white/5">
+        <div className="rounded-2xl border-2 border-black bg-white transition hover:border-teal-300 dark:border-black dark:bg-white/5">
             <button
                 onClick={onToggle}
                 className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left"
                 aria-expanded={isOpen}
             >
                 <span className="text-sm font-semibold sm:text-base">{item.q}</span>
-                <svg
-                    viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"
+                <MdArrowForward
                     className={`h-5 w-5 shrink-0 text-teal-600 transition-transform duration-300 dark:text-teal-400 ${isOpen ? 'rotate-180' : ''}`}
-                >
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-                </svg>
+                />
             </button>
             <div className={`grid overflow-hidden px-5 transition-all duration-300 ease-in-out ${isOpen ? 'grid-rows-[1fr] pb-5 opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
                 <div className="overflow-hidden">
@@ -95,11 +93,11 @@ function FaqItem({ item, isOpen, onToggle }) {
 function FaqSection() {
     const [open, setOpen] = useState(0);
     return (
-        <section className="border-t border-black/10 dark:border-white/10">
+        <section className="border-t-2 border-black dark:border-black">
             <div className="mx-auto max-w-3xl px-4 py-24 sm:px-6 lg:px-8">
                 <MotionDiv variants={fadeUp} initial="hidden" whileInView="show" viewport={viewport} className="text-center">
                     <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">Frequently asked questions</h2>
-                    <p className="mt-4 text-base text-slate-500 dark:text-slate-400">Everything you need to know about building documents with CareerHub.</p>
+                    <p className="mt-4 text-base text-slate-500 dark:text-slate-400">Everything you need to know about sharing code with CodeShare.</p>
                 </MotionDiv>
                 <div className="mt-12 space-y-3">
                     {FAQS.map((item, i) => (
@@ -126,9 +124,7 @@ function Stars({ count = 5 }) {
         <div className="flex gap-0.5">
             {Array.from({ length: 5 }).map((_, i) => (
                 <span key={i} className={`flex h-5 w-5 items-center justify-center rounded ${i < count ? 'bg-teal-500' : 'bg-slate-200 dark:bg-white/10'}`}>
-                    <svg viewBox="0 0 20 20" fill="white" className="h-3 w-3">
-                        <path d="M10 1.5l2.6 5.27 5.82.85-4.21 4.1.99 5.8L10 14.77l-5.2 2.75.99-5.8L1.58 7.62l5.82-.85L10 1.5z" />
-                    </svg>
+                    <MdStar className="h-3 w-3 text-white" />
                 </span>
             ))}
         </div>
@@ -139,7 +135,7 @@ export default function HomeSections() {
     return (
         <div className="text-slate-900">
 
-            <section className="border-b border-black/10 dark:border-white/10">
+            <section className="border-b-2 border-black dark:border-black">
                 <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
                     <p className="text-center text-xs font-semibold uppercase tracking-widest text-slate-400">
                         Trusted by job seekers hired at
@@ -176,20 +172,20 @@ export default function HomeSections() {
                             Chosen by <span className="text-teal-600 dark:text-teal-400">thousands</span> of job applicants worldwide
                         </h2>
                         <p className="mt-5 text-base leading-relaxed text-slate-500 dark:text-slate-400">
-                            CareerHub is a document builder that helps you create applications with impact and professionalism — trusted at every step of the job hunt to emphasize your experience, value, and skills.
+                            CodeShare is a code sharing platform that helps you collaborate efficiently with your team — trusted for sharing code snippets, technical reviews, and real-time collaboration.
                         </p>
                         <p className="mt-4 text-base leading-relaxed text-slate-500 dark:text-slate-400">
                             We pair flexible, ATS-friendly templates with an intuitive editor and a live PDF preview, so you can present a complete, polished application in minutes.
                         </p>
                         <Link to="/login" className="mt-7 inline-flex items-center gap-1.5 text-sm font-semibold text-teal-600 hover:text-teal-700 dark:text-teal-400">
                             Explore templates
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="h-4 w-4"><path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4-4 4M3 12h18" /></svg>
+                            <MdArrowForward className="h-4 w-4" />
                         </Link>
                     </MotionDiv>
                 </div>
             </section>
 
-            <section className="border-y border-black/10 dark:border-white/10">
+            <section className="border-y-2 border-black dark:border-black">
                 <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
                     <div className="mx-auto max-w-2xl text-center">
                         <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">Everything you need to get hired</h2>
@@ -198,7 +194,7 @@ export default function HomeSections() {
                     <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
                         {FEATURES.map((f, i) => (
                             <MotionDiv key={f.title} custom={i} variants={fadeUp} initial="hidden" whileInView="show" viewport={viewport}
-                                className="rounded-2xl border border-black/10 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-lg dark:border-white/10 dark:bg-white/5">
+                                className="rounded-2xl border-2 border-black bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-lg dark:border-black dark:bg-white/5">
                                 <FeatureIcon path={f.path} />
                                 <h3 className="text-base font-semibold">{f.title}</h3>
                                 <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">{f.desc}</p>
@@ -222,14 +218,14 @@ export default function HomeSections() {
                             </p>
                             <Link to="/login" className="mt-8 inline-flex items-center gap-1.5 rounded-full bg-teal-500 px-6 py-3 text-sm font-semibold text-white shadow-lg transition hover:bg-teal-400">
                                 Build an ATS-friendly resume
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="h-4 w-4"><path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4-4 4M3 12h18" /></svg>
+                                <MdArrowForward className="h-4 w-4" />
                             </Link>
                         </MotionDiv>
 
                         <div className="space-y-4">
                             {ATS_PILLS.map((p, i) => (
                                 <MotionDiv key={p.title} custom={i} variants={fadeUp} initial="hidden" whileInView="show" viewport={viewport}
-                                    className={`flex items-center gap-4 rounded-2xl border border-white/15 bg-white/10 p-4 backdrop-blur-sm ${i === 1 ? 'lg:ml-12' : i === 2 ? 'lg:ml-6' : ''}`}>
+                                    className={`flex items-center gap-4 rounded-2xl border border-2 border-black bg-white/10 p-4 backdrop-blur-sm ${i === 1 ? 'lg:ml-12' : i === 2 ? 'lg:ml-6' : ''}`}>
                                     <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white text-indigo-600">
                                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-6 w-6"><path strokeLinecap="round" strokeLinejoin="round" d={p.path} /></svg>
                                     </span>
@@ -268,27 +264,25 @@ export default function HomeSections() {
                     </div>
                     <Link to="/login" className="group inline-flex shrink-0 items-center gap-1.5 rounded-full border border-teal-500/40 px-5 py-2.5 text-sm font-semibold text-teal-600 transition hover:bg-teal-500 hover:text-white dark:text-teal-400">
                         Browse all templates
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="h-4 w-4 transition-transform group-hover:translate-x-0.5"><path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4-4 4M3 12h18" /></svg>
+                        <MdArrowForward className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
                     </Link>
                 </div>
 
                 <div className="mx-auto mt-14 grid max-w-8xl grid-cols-2 gap-6 sm:grid-cols-4">
                     {TEMPLATES.map((t, i) => (
                         <MotionDiv key={t.name} custom={i} variants={fadeUp} initial="hidden" whileInView="show" viewport={viewport}>
-                            <div className="overflow-hidden bg-white shadow-md ring-1 ring-black/5" style={{ aspectRatio: '3/4' }}>
-                                <img
-                                    src={t.src}
-                                    alt=""
-                                    className="h-full w-full object-cover object-top"
-                                    onError={(e) => { e.currentTarget.src = 'https://placehold.co/600x800?text=Template'; }}
-                                />
+                            <div className="overflow-hidden bg-gradient-to-br from-teal-50 to-cyan-50 shadow-md ring-1 ring-slate-200 h-48 rounded-lg flex items-center justify-center">
+                                <div className="text-center space-y-2">
+                                    <div className="text-2xl font-bold text-teal-600">{t.name}</div>
+                                    <div className="text-sm text-slate-600">{t.tag}</div>
+                                </div>
                             </div>
                         </MotionDiv>
                     ))}
                 </div>
             </section>
 
-            <section className="relative overflow-hidden border-y border-black/10 dark:border-white/10">
+            <section className="relative overflow-hidden border-y-2 border-black dark:border-black">
 
                 <div
                     className="pointer-events-none absolute left-1/2 top-1/2 -z-10 h-[120%] w-[85%] -translate-x-1/2 -translate-y-1/2 rounded-[45%] blur-[90px] opacity-70 dark:opacity-40"
@@ -313,7 +307,7 @@ export default function HomeSections() {
                         <div className="columns-1 gap-5 sm:columns-2 [&>*]:mb-5">
                             {REVIEWS.map((r, i) => (
                                 <MotionDiv key={r.name} custom={i % 3} variants={fadeUp} initial="hidden" whileInView="show" viewport={viewport}
-                                    className="break-inside-avoid rounded-2xl border border-black/5 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-white/5">
+                                    className="break-inside-avoid rounded-2xl border border-2 border-black bg-white p-5 shadow-sm dark:border-black dark:bg-white/5">
                                     <Stars count={r.stars} />
                                     <p className="mt-2 text-xs text-slate-400">{r.when}</p>
                                     <p className="mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-300">{r.text}</p>
