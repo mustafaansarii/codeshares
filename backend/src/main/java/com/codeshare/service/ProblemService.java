@@ -3,6 +3,7 @@ package com.codeshare.service;
 import com.codeshare.dto.ProblemRequestDto;
 import com.codeshare.dto.ProblemResponseDto;
 import com.codeshare.dto.PaginatedResponse;
+import com.codeshare.dto.ProblemFilterRequestDto;
 import com.codeshare.dto.TestCaseDto;
 import com.codeshare.entity.Problem;
 import com.codeshare.entity.TestCase;
@@ -40,17 +41,17 @@ public class ProblemService {
         return mapToResponseDto(problem);
     }
 
-    public PaginatedResponse<ProblemResponseDto> getAllProblems(
-            String keyword, String sheetName, int page, int size) {
-        return searchProblems(keyword, sheetName, page, size);
+    public PaginatedResponse<ProblemResponseDto> getAllProblems(ProblemFilterRequestDto filterDto) {
+        return searchProblems(filterDto.getKeyword(), filterDto.getSheetName(),
+                filterDto.getPage(), filterDto.getSize());
     }
 
-    private PaginatedResponse<ProblemResponseDto> searchProblems(
-            String keyword, String sheetName, int page, int size) {
+    private PaginatedResponse<ProblemResponseDto> searchProblems(String keyword, String sheetName, int page, int size) {
         String kw = (keyword == null || keyword.isBlank()) ? null : keyword.trim();
         String sn = (sheetName == null || sheetName.isBlank()) ? null : sheetName.trim();
-        Page<Problem> result = problemRepository.search(
-                kw, sn, PageRequest.of(page, size, Sort.by("createdAt").descending()));
+
+        Page<Problem> result = problemRepository.search(kw, sn, PageRequest.of(page, size, Sort.by("createdAt").descending()));
+        
         List<ProblemResponseDto> content = result.getContent().stream()
                 .map(this::mapToResponseDto)
                 .collect(Collectors.toList());

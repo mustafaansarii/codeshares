@@ -2,6 +2,7 @@ package com.codeshare.controller;
 
 import com.codeshare.dto.ApiResponse;
 import com.codeshare.dto.PaginatedResponse;
+import com.codeshare.dto.ProblemFilterRequestDto;
 import com.codeshare.dto.ProblemRequestDto;
 import com.codeshare.dto.ProblemResponseDto;
 import com.codeshare.service.ProblemService;
@@ -11,12 +12,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -42,11 +43,8 @@ public class ProblemController {
 
     @GetMapping
     public ResponseEntity<PaginatedResponse<ProblemResponseDto>> getAllProblems(
-            @RequestParam(required = false) String keyword,
-            @RequestParam(required = false, name = "sheet_name") String sheetName,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size) {
-        return ResponseEntity.ok(problemService.getAllProblems(keyword, sheetName, page, size));
+            @ModelAttribute ProblemFilterRequestDto problemFilterRequestDto) {
+        return ResponseEntity.ok(problemService.getAllProblems(problemFilterRequestDto));
     }
 
     @PutMapping("/{id}")
