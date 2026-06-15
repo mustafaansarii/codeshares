@@ -2,12 +2,17 @@ package com.codeshare.service;
 
 import com.codeshare.dto.ProblemRequestDto;
 import com.codeshare.dto.ProblemResponseDto;
+import com.codeshare.dto.PaginatedResponse;
 import com.codeshare.dto.TestCaseDto;
 import com.codeshare.entity.Problem;
 import com.codeshare.entity.TestCase;
 import com.codeshare.repository.ProblemRepository;
 import com.codeshare.repository.TestCaseRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,10 +40,30 @@ public class ProblemService {
         return mapToResponseDto(problem);
     }
 
-    public List<ProblemResponseDto> getAllProblems() {
-        return problemRepository.findAll().stream()
+    public PaginatedResponse<ProblemResponseDto> getAllProblems(
+            String keyword, String sheetName, int page, int size) {
+        return searchProblems(keyword, sheetName, page, size);
+    }
+
+    private PaginatedResponse<ProblemResponseDto> searchProblems(
+            String keyword, String sheetName, int page, int size) {
+        String kw = (keyword == null || keyword.isBlank()) ? null : keyword.trim();
+        String sn = (sheetName == null || sheetName.isBlank()) ? null : sheetName.trim();
+        Page<Problem> result = problemRepository.search(
+                kw, sn, PageRequest.of(page, size, Sort.by("createdAt").descending()));
+        List<ProblemResponseDto> content = result.getContent().stream()
                 .map(this::mapToResponseDto)
                 .collect(Collectors.toList());
+        return PaginatedResponse.<ProblemResponseDto>builder()
+                .status("success")
+                .data(content)
+                .count(content.size())
+                .totalItems(result.getTotalElements())
+                .totalPages(result.getTotalPages())
+                .page(result.getNumber())
+                .pageSize(result.getSize())
+                .code(200)
+                .build();
     }
 
     @Transactional

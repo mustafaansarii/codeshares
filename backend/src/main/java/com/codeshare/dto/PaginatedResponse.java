@@ -17,7 +17,11 @@ public class PaginatedResponse<T> {
     private String status;
     private String message;
     private List<T> data;
-    private Integer count;
+    private Integer count;       // items on this page
+    private Long totalItems;     // total matching records
+    private Integer totalPages;
+    private Integer page;
+    private Integer pageSize;
     private Integer code;
 
     @JsonProperty("timestamp")

@@ -16,9 +16,12 @@ const ICONS = {
 
 const navItems = [
     { label: 'Home', to: '/' },
+    { label: 'Problems', to: '/problems' },
 ];
 
-const profileItems = [];
+const profileItems = [
+    { label: 'My Profile', to: '/profile' },
+];
 
 function megaLinks(item) {
     const out = [];
@@ -270,18 +273,18 @@ function ProfileMenu({ onLogout }) {
                         <p className="text-[11px] font-semibold uppercase tracking-widest text-slate-400">Account</p>
                     </div>
                     <div className="space-y-0.5 p-2">
-                        {profileItems.map((item) => (
-                            <NavLink
-                                key={item.to}
-                                to={item.to}
-                                onClick={() => setOpen(false)}
-                                className={({ isActive }) =>
-                                    `block rounded-lg px-3 py-2 text-sm font-medium transition-colors ${isActive ? 'bg-teal-50 text-teal-700' : 'text-slate-700 hover:bg-slate-50'}`
-                                }
-                            >
-                                {item.label}
-                            </NavLink>
-                        ))}
+                        <NavLink
+                            to="/profile"
+                            onClick={() => setOpen(false)}
+                            className={({ isActive }) =>
+                                `flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm font-medium transition-colors ${isActive ? 'bg-teal-50 text-teal-700' : 'text-slate-700 hover:bg-slate-50'}`
+                            }
+                        >
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-4 w-4">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z" />
+                            </svg>
+                            My Profile
+                        </NavLink>
                     </div>
                     <div className="border-t border-2 border-black p-2">
                         <button
@@ -384,6 +387,13 @@ export default function Navbar() {
     const mobileMenuRef = useRef(null);
     const headerRef = useRef(null);
     const [mobileMenuTop, setMobileMenuTop] = useState(56);
+
+    // Verify with backend on mount — clears stale localStorage if session expired
+    useEffect(() => {
+        authService.verifyAuth().then(() => {
+            setIsAuthenticated(authService.isAuthenticated());
+        });
+    }, []);
 
     useEffect(() => {
         setIsAuthenticated(authService.isAuthenticated());

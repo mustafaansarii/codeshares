@@ -50,8 +50,8 @@ spring:
 
 logging:
   level:
-    root: ${LOG_LEVEL_ROOT:ERROR}
-    com.codeshare: ${LOG_LEVEL_APP:INFO}
+    root: ${LOG_LEVEL_ROOT:TRACE}
+    com.codeshare: ${LOG_LEVEL_APP:TRACE}
 
 server:
   port: ${PORT:5001}

@@ -5,13 +5,16 @@ import './index.css';
 
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
+import ProfilePage from './pages/ProfilePage';
+import ProblemsPage from './pages/ProblemsPage';
+import { ProtectedRoute, GuestRoute } from './components/shared/RouteGuards';
 import Footer from './components/footer/Footer';
 import NotFound from './components/not-found/NotFound';
 import authService from './services/auth.service';
 
 function App() {
   const location = useLocation();
-  const noFooterPaths = ['/login'];
+  const noFooterPaths = ['/login', '/profile', '/problems'];
   const hideFooter = noFooterPaths.includes(location.pathname);
 
   const [authReady, setAuthReady] = useState(false);
@@ -37,7 +40,9 @@ function App() {
       />
       <Routes>
         <Route path="/" element={<HomePage />} />
-        <Route path="/login" element={<LoginPage />} />
+        <Route path="/login" element={<GuestRoute><LoginPage /></GuestRoute>} />
+        <Route path="/problems" element={<ProblemsPage />} />
+        <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
         <Route path="*" element={<NotFound />} />
       </Routes>
       {!hideFooter && <Footer />}

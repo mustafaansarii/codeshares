@@ -9,10 +9,10 @@ export default defineConfig(({ mode }) => {
     plugins: [react()],
     server: {
       proxy: {
-        '/careerhub': {
+        '/codeshare': {
           target: backendUrl,
           changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/careerhub/, ''),
+          rewrite: (path) => path.replace(/^\/codeshare/, ''),
         },
       },
     },
