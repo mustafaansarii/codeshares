@@ -14,15 +14,21 @@ import java.util.Optional;
 public interface ProblemRepository extends JpaRepository<Problem, Long> {
     Optional<Problem> findByTitle(String title);
 
+    /**
+     * JPQL search — parameters are never null:
+     *   kw  = "%" when no keyword filter (LIKE '%' matches everything)
+     *   sn  = "" when no sheet filter  (skip via ':sn = \'\')
+     * This avoids the PostgreSQL bytea type-inference error that occurs
+     * when Hibernate sends a null String parameter.
+     */
     @Query("""
             SELECT p FROM Problem p
-            WHERE (:keyword IS NULL OR LOWER(p.title) LIKE LOWER(CONCAT('%', :keyword, '%'))
-                                    OR LOWER(p.description) LIKE LOWER(CONCAT('%', :keyword, '%')))
-              AND (:sheetName IS NULL OR LOWER(p.sheetName) = LOWER(:sheetName))
+            WHERE (LOWER(p.title) LIKE :kw OR LOWER(p.description) LIKE :kw)
+              AND (:sn = '' OR LOWER(p.sheetName) = :sn)
+            ORDER BY p.createdAt DESC
             """)
     Page<Problem> search(
-            @Param("keyword") String keyword,
-            @Param("sheetName") String sheetName,
+            @Param("kw") String kw,
+            @Param("sn") String sn,
             Pageable pageable);
 }
-

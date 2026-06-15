@@ -142,8 +142,85 @@ public class CodeExecutionService {
 
     private Path writeSourceFile(Path dir, Language language, String code) throws IOException {
         Path file = dir.resolve(language.getSourceFileName());
-        Files.writeString(file, code, StandardCharsets.UTF_8);
+        Files.writeString(file, wrapWithHarness(language, code), StandardCharsets.UTF_8);
         return file;
+    }
+
+    /**
+     * Wraps the user's Solution class with a hidden main-method harness.
+     * The harness reads the entire stdin (test-case input) as one String,
+     * calls {@code solution.solve(input)}, and prints the return value.
+     * Users only need to implement {@code solve()} — no I/O boilerplate.
+     */
+    private String wrapWithHarness(Language language, String userCode) {
+        return switch (language) {
+            case JAVA -> """
+                    import java.io.*;
+                    %s
+                    public class Main {
+                        public static void main(String[] args) throws Exception {
+                            BufferedReader __br = new BufferedReader(new InputStreamReader(System.in));
+                            StringBuilder __sb = new StringBuilder();
+                            String __line;
+                            while ((__line = __br.readLine()) != null) __sb.append(__line).append("\\n");
+                            String __input = __sb.toString().trim();
+                            String __result = new Solution().solve(__input);
+                            System.out.print(__result);
+                        }
+                    }
+                    """.formatted(userCode);
+
+            case PYTHON -> """
+                    %s
+                    if __name__ == "__main__":
+                        import sys
+                        __input = sys.stdin.read().strip()
+                        __result = Solution().solve(__input)
+                        print(__result, end="")
+                    """.formatted(userCode);
+
+            case CPP -> """
+                    #include <bits/stdc++.h>
+                    using namespace std;
+                    %s
+                    int main() {
+                        string __input((istreambuf_iterator<char>(cin)), istreambuf_iterator<char>());
+                        while (!__input.empty() && __input.back() == '\\n') __input.pop_back();
+                        cout << Solution().solve(__input);
+                        return 0;
+                    }
+                    """.formatted(userCode);
+
+            case C -> """
+                    #include <stdio.h>
+                    #include <stdlib.h>
+                    #include <string.h>
+                    %s
+                    int main() {
+                        char* __buf = (char*)malloc(1 << 20);
+                        int __len = 0, __c;
+                        while ((__c = getchar()) != EOF) __buf[__len++] = (char)__c;
+                        while (__len > 0 && __buf[__len - 1] == '\\n') __len--;
+                        __buf[__len] = '\\0';
+                        printf("%%s", solve(__buf));
+                        free(__buf);
+                        return 0;
+                    }
+                    """.formatted(userCode);
+
+            case NODE -> """
+                    %s
+                    process.stdin.resume();
+                    process.stdin.setEncoding('utf8');
+                    let __data = '';
+                    process.stdin.on('data', d => __data += d);
+                    process.stdin.on('end', () => {
+                        const __input = __data.trim();
+                        const __result = new Solution().solve(__input);
+                        process.stdout.write(String(__result));
+                    });
+                    """.formatted(userCode);
+        };
     }
 
     private List<String> buildCompileCommand(Language language, String sourceFileName) {

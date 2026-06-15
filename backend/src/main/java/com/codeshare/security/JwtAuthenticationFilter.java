@@ -1,5 +1,6 @@
 package com.codeshare.security;
 
+import com.codeshare.entity.AuthUser;
 import com.codeshare.service.AuthService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -63,6 +64,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 new UsernamePasswordAuthenticationToken(inspection.email(), inspection.tokenId(), authorities);
         authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
         SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        // Eagerly load and expose the AuthUser so controllers can read it
+        // via httpRequest.getAttribute("user") without hitting the DB again.
+        try {
+            AuthUser user = authService.getActiveUser(inspection.email());
+            request.setAttribute("user", user);
+            request.setAttribute("userId", user.getId());
+        } catch (Exception ignored) {
+            // If user lookup fails the SecurityContext is still set; endpoint
+            // security will reject the request if the user is required.
+        }
     }
 
     private String fromCookie(HttpServletRequest request) {

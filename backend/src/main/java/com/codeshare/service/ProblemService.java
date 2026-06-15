@@ -47,10 +47,11 @@ public class ProblemService {
     }
 
     private PaginatedResponse<ProblemResponseDto> searchProblems(String keyword, String sheetName, int page, int size) {
-        String kw = (keyword == null || keyword.isBlank()) ? null : keyword.trim();
-        String sn = (sheetName == null || sheetName.isBlank()) ? null : sheetName.trim();
+        // Never pass null — '%' wildcard catches all; '' skips the sheet filter via ':sn = '''' check
+        String kw = (keyword == null || keyword.isBlank()) ? "%" : "%" + keyword.trim().toLowerCase() + "%";
+        String sn = (sheetName == null || sheetName.isBlank()) ? "" : sheetName.trim().toLowerCase();
 
-        Page<Problem> result = problemRepository.search(kw, sn, PageRequest.of(page, size, Sort.by("createdAt").descending()));
+        Page<Problem> result = problemRepository.search(kw, sn, PageRequest.of(page, size));
         
         List<ProblemResponseDto> content = result.getContent().stream()
                 .map(this::mapToResponseDto)

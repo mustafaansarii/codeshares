@@ -43,6 +43,7 @@ public class UserSolutionService {
         List<TestCase> sampleTestCases = testCaseRepository.findByProblemId(problem.getId())
                 .stream()
                 .filter(TestCase::getIsSample)
+                .limit(3)                          // Run shows only first 3 samples
                 .collect(Collectors.toList());
 
         return executeTestCases(solution, sampleTestCases, problem);
@@ -90,7 +91,8 @@ public class UserSolutionService {
         solution.setLanguage(requestDto.getLanguage());
         solution.setStatus("RUNNING");
 
-        return solution;
+        // Must be persisted NOW so TestCaseExecution FK references a real ID.
+        return solutionRepository.save(solution);
     }
 
     private UserSolutionResponseDto executeTestCases(UserSolution solution, List<TestCase> testCases, Problem problem) {
