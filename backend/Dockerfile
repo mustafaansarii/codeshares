@@ -4,11 +4,9 @@ COPY pom.xml .
 COPY src ./src
 RUN mvn -q -DskipTests package
 
-FROM eclipse-temurin:21-jdk
-RUN apt-get update && \
-    apt-get install -y gcc g++ python3 nodejs && \
-    rm -rf /var/lib/apt/lists/*
+FROM eclipse-temurin:21-jdk-alpine
+RUN apk add --no-cache gcc musl-dev g++ python3 nodejs npm
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
-EXPOSE 8080
+EXPOSE 5001
 ENTRYPOINT ["java", "-jar", "app.jar"]
