@@ -54,10 +54,14 @@ class AuthService {
 
     async verifyAuth() {
         try {
-            await silentAxios.get('me');
-            localStorage.setItem('isAuthenticated', 'true');
-        } catch {
-            localStorage.removeItem('isAuthenticated');
+            const response = await silentAxios.get('me');
+            if (response.status === 200) {
+                localStorage.setItem('isAuthenticated', 'true');
+            }
+        } catch (error) {
+            if (error.response?.status === 401 || error.response?.status === 403) {
+                localStorage.removeItem('isAuthenticated');
+            }
         }
     }
 }
