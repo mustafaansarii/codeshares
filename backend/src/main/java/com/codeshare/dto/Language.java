@@ -1,4 +1,4 @@
-package com.codeshare.service.model;
+package com.codeshare.dto;
 
 import java.util.Arrays;
 import java.util.List;

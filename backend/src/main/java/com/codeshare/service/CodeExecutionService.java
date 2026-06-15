@@ -4,8 +4,8 @@ import com.codeshare.dto.CodeRunRequestForm;
 import com.codeshare.dto.CodeRunResponseForm;
 import com.codeshare.exception.CodeExecutionException;
 import com.codeshare.exception.UnsupportedLanguageException;
-import com.codeshare.service.model.ExecutionResult;
-import com.codeshare.service.model.Language;
+import com.codeshare.dto.ExecutionResult;
+import com.codeshare.dto.Language;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
