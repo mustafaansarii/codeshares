@@ -1,0 +1,3 @@
+method,path,roles
+GET,/api/auth/me,USER|ADMIN
+PATCH,/api/auth/profile,USER|ADMIN

@@ -1,0 +1,18 @@
+{
+    "builds": [
+        {
+            "src": "package.json",
+            "use": "@vercel/static-build"
+        }
+    ],
+    "rewrites": [
+        {
+            "source": "/careerhub/:path*",
+            "destination": "https://doc-service-srwe.onrender.com/:path*"
+        },
+        {
+            "source": "/(.*)",
+            "destination": "/index.html"
+        }
+    ]
+}
