@@ -1,11 +1,8 @@
 package com.codeshare.controller;
 
-import com.codeshare.dto.request.SigninRequest;
-import com.codeshare.dto.request.SignupRequest;
 import com.codeshare.dto.response.MessageResponse;
 import com.codeshare.dto.response.UserResponse;
 import com.codeshare.dtoApi.AuthDtoApi;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -24,22 +21,6 @@ public class AuthController {
 
     @Autowired
     private AuthDtoApi authDtoApi;
-
-    @PostMapping("/signup")
-    public MessageResponse signup(@RequestBody SignupRequest signupRequest) {
-        return authDtoApi.signup(signupRequest);
-    }
-
-    @PostMapping("/register")
-    public UserResponse register(@RequestBody SignupRequest registerRequest) {
-        return authDtoApi.register(registerRequest);
-    }
-
-    @PostMapping("/signin")
-    public UserResponse signin(@RequestBody SigninRequest signinRequest,
-                               HttpServletRequest httpRequest, HttpServletResponse httpResponse) {
-        return authDtoApi.signin(signinRequest, httpRequest, httpResponse);
-    }
 
     @PostMapping("/logout")
     public MessageResponse logout(Authentication authentication, HttpServletResponse httpResponse) {

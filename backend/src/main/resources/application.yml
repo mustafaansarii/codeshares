@@ -11,25 +11,11 @@ spring:
 
   application:
     name: ${APP_NAME:DOC-SERVICE}
-  mail:
-    host: ${MAIL_HOST:smtp.gmail.com}
-    port: ${MAIL_PORT:587}
-    username: ${MAIL_USERNAME:}
-    password: ${MAIL_PASSWORD:}
-    properties:
-      mail:
-        smtp:
-          auth: true
-          starttls:
-            enable: true
-          connectiontimeout: 5000
-          timeout: 5000
-          writetimeout: 5000
 
   datasource:
-    url: ${DATABASE_URL}
-    username: ${DATABASE_USERNAME}
-    password: ${DATABASE_PASSWORD}
+    url: ${DATABASE_URL:jdbc:postgresql://ep-little-tooth-aietft4j-pooler.c-4.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require}
+    username: ${DATABASE_USERNAME:neondb_owner}
+    password: ${DATABASE_PASSWORD:npg_V3CtPOF9KSuh}
     driver-class-name: org.postgresql.Driver
     
   jpa:
@@ -71,8 +57,8 @@ server:
   port: ${PORT:5001}
 
 google:
-  clientId: ${GOOGLE_CLIENT_ID:}
-  clientSecret: ${GOOGLE_CLIENT_SECRET:}
+  clientId: ${GOOGLE_CLIENT_ID:714053477959-f413v63lor5gt8u2r5vejdhqp0rr4r36.apps.googleusercontent.com}
+  clientSecret: ${GOOGLE_CLIENT_SECRET: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}
 
 github:
   clientId: ${GITHUB_CLIENT_ID:}

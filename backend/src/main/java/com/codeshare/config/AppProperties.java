@@ -43,8 +43,6 @@ public class AppProperties {
     @Value("${auth.cookie.path:/}")
     private String cookiePath;
 
-    @Value("${spring.mail.username:}")
-    private String mailFrom;
 
     @Value("${google.clientId:}")
     private String googleClientId;

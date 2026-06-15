@@ -1,17 +1,13 @@
 package com.codeshare.dtoApi;
 
-import com.codeshare.dto.request.SigninRequest;
-import com.codeshare.dto.request.SignupRequest;
 import com.codeshare.dto.response.MessageResponse;
 import com.codeshare.dto.response.UserResponse;
 import com.codeshare.entity.AuthUser;
 import com.codeshare.security.AuthCookies;
-import com.codeshare.security.RequestMetadataExtractor;
 import com.codeshare.exception.ApiException;
 import com.codeshare.service.AuthService;
 import com.codeshare.util.AbstractDtoUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,23 +33,6 @@ public class AuthDtoApi extends AbstractDtoUtil {
     @Autowired
     private ObjectMapper objectMapper;
 
-    public MessageResponse signup(SignupRequest request) {
-        validate(request);
-        return authService.signup(request);
-    }
-
-    public UserResponse register(SignupRequest request) {
-        validate(request);
-        return toUserResponse(authService.register(request));
-    }
-
-    public UserResponse signin(SigninRequest request, HttpServletRequest httpRequest, HttpServletResponse httpResponse) {
-        validate(request);
-        AuthService.LoginResult result = authService.login(request, RequestMetadataExtractor.extract(httpRequest));
-        httpResponse.addHeader(HttpHeaders.SET_COOKIE, authCookies.access(result.accessToken()).toString());
-        return toUserResponse(result.user());
-    }
-
     public MessageResponse logout(Authentication authentication, HttpServletResponse httpResponse) {
         authService.revokeSession(tokenIdOf(authentication));
         httpResponse.addHeader(HttpHeaders.SET_COOKIE, authCookies.clear().toString());
@@ -74,7 +53,7 @@ public class AuthDtoApi extends AbstractDtoUtil {
         }
         return toUserResponse(authService.updateProfile(authentication.getName(), json));
     }
-    
+
 //-----------------------------------private methods-----------------------------------
     private UserResponse toUserResponse(AuthUser user) {
         Object profile = null;

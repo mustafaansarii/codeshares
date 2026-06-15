@@ -385,9 +385,6 @@ function MobileMenu({ visibleNavItems, isAuthenticated, profileItems, onLogout, 
                         <NavLink to="/login" className="block w-full rounded-full border border-slate-300 px-3 py-2.5 text-center text-sm font-semibold text-slate-800 hover:bg-slate-50">
                             Sign in
                         </NavLink>
-                        <NavLink to="/signup" className="block w-full rounded-full border-2 border-teal-500 px-3 py-2.5 text-center text-sm font-semibold text-teal-600 hover:bg-teal-50">
-                            Get Started
-                        </NavLink>
                     </div>
                 )}
             </div>
@@ -475,18 +472,9 @@ export default function Navbar() {
                         <div className="hidden items-center gap-1.5 md:flex">
                             <NavLink
                                 to="/login"
-                                className="rounded-lg px-3.5 py-2 text-sm font-medium text-white/90 transition hover:bg-white/10 hover:text-white"
-                            >
-                                Sign in
-                            </NavLink>
-                            <NavLink
-                                to="/signup"
                                 className="inline-flex items-center gap-1.5 rounded-full border-2 border-teal-400 px-5 py-2 text-sm font-semibold text-white transition hover:bg-teal-400/10"
                             >
-                                Get Started
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="h-3.5 w-3.5">
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4-4 4M3 12h18" />
-                                </svg>
+                                Sign in
                             </NavLink>
                         </div>
                     )}

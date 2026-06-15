@@ -6,11 +6,9 @@ export default function Footer() {
         product: [
             { name: 'Home', url: '/' },
             { name: 'Sign In', url: '/login' },
-            { name: 'Get Started', url: '/signup' },
         ],
         account: [
             { name: 'Sign In', url: '/login' },
-            { name: 'Create Account', url: '/signup' },
         ],
         company: [
             { name: 'Home', url: '/' },

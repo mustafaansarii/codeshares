@@ -52,12 +52,6 @@ public class AuthUser {
     @Column(nullable = false)
     private boolean verified;
 
-    private String otpHash;
-
-    private Instant otpExpiresAt;
-
-    @Column(nullable = false)
-    private int otpAttempts;
 
     @Column(nullable = false, updatable = false)
     private Instant createdAt;

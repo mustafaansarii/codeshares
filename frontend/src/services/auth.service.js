@@ -30,22 +30,6 @@ axiosInstance.interceptors.response.use(
 );
 
 class AuthService {
-    async signup(fullName, email, password) {
-        const response = await axiosInstance.post('signup', { fullName, email, password });
-        return response.data;
-    }
-
-    async register(fullName, email, password, otp) {
-        const response = await axiosInstance.post('register', { fullName, email, password, otp });
-        return response.data;
-    }
-
-    async signin(email, password) {
-        const response = await axiosInstance.post('signin', { email, password });
-        localStorage.setItem('isAuthenticated', 'true');
-        return response.data;
-    }
-
     async logout() {
         try {
             const response = await axiosInstance.post('logout');
