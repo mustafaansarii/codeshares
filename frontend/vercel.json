@@ -7,6 +7,10 @@
     ],
     "rewrites": [
         {
+            "source": "/codeshare/health",
+            "destination": "https://codeshares-backend-latest.onrender.com/health"
+        },
+        {
             "source": "/codeshare/:path*",
             "destination": "https://codeshares-backend-latest.onrender.com/codeshare/:path*"
         },
