@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Route, Routes, useLocation } from 'react-router-dom';
+import { Route, Routes, useLocation, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import './index.css';
 
@@ -8,7 +8,7 @@ import LoginPage from './pages/LoginPage';
 import ProfilePage from './pages/ProfilePage';
 import ProblemsPage from './pages/ProblemsPage';
 import ProblemEditorPage from './pages/ProblemEditorPage';
-import { ProtectedRoute, GuestRoute } from './components/shared/RouteGuards';
+import PrivateRoute from './components/route-manage/PrivateRoute';
 import Footer from './components/footer/Footer';
 import NotFound from './components/not-found/NotFound';
 import authService from './services/auth.service';
@@ -42,10 +42,24 @@ function App() {
       />
       <Routes>
         <Route path="/" element={<HomePage />} />
-        <Route path="/login" element={<GuestRoute><LoginPage /></GuestRoute>} />
+        <Route path="/login" element={authService.isAuthenticated() ? <Navigate to="/" replace /> : <LoginPage />} />
         <Route path="/problems" element={<ProblemsPage />} />
-        <Route path="/problems/:id" element={<ProblemEditorPage />} />
-        <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+        <Route
+          path="/problems/:id"
+          element={
+            <PrivateRoute>
+              <ProblemEditorPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <PrivateRoute>
+              <ProfilePage />
+            </PrivateRoute>
+          }
+        />
         <Route path="*" element={<NotFound />} />
       </Routes>
       {!hideFooter && <Footer />}
