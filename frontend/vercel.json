@@ -11,10 +11,6 @@
             "destination": "https://codeshares-backend-latest.onrender.com/codeshare/api/:path*"
         },
         {
-            "source": "/careerhub/:path*",
-            "destination": "https://doc-service-srwe.onrender.com/:path*"
-        },
-        {
             "source": "/(.*)",
             "destination": "/index.html"
         }
