@@ -24,14 +24,6 @@ public class CookieAuthorizationRequestRepository
     private static final String COOKIE_NAME = "OAUTH2_AUTH_REQUEST";
     private static final int EXPIRE_SECONDS = 600;
 
-    private final boolean secure;
-    private final String sameSite;
-
-    public CookieAuthorizationRequestRepository() {
-        this.secure = true;
-        this.sameSite = "None";
-    }
-
     @Override
     public OAuth2AuthorizationRequest loadAuthorizationRequest(HttpServletRequest request) {
         return readCookie(request).map(this::deserialize).orElse(null);
@@ -47,8 +39,7 @@ public class CookieAuthorizationRequestRepository
         ResponseCookie cookie = ResponseCookie.from(COOKIE_NAME, serialize(authorizationRequest))
                 .path("/")
                 .httpOnly(true)
-                .secure(secure)
-                .sameSite(sameSite)
+                .sameSite("Lax")
                 .maxAge(EXPIRE_SECONDS)
                 .build();
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
@@ -79,7 +70,7 @@ public class CookieAuthorizationRequestRepository
 
     private void deleteCookie(HttpServletResponse response) {
         ResponseCookie cookie = ResponseCookie.from(COOKIE_NAME, "")
-                .path("/").httpOnly(true).secure(secure).sameSite(sameSite).maxAge(0).build();
+                .path("/").httpOnly(true).sameSite("Lax").maxAge(0).build();
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
     }
 

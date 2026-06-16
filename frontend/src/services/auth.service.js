@@ -49,7 +49,7 @@ class AuthService {
     }
 
     loginWithProvider(provider) {
-        window.location.href = `https://codeshares-backend-latest.onrender.com/oauth2/authorization/${provider}`;
+        window.location.href = `/codeshare/oauth2/authorization/${provider}`;
     }
 
     async verifyAuth() {
