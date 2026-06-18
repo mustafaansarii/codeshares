@@ -36,6 +36,23 @@ public class JwtService {
                 .compact();
     }
 
+    /**
+     * Short-lived token used to authenticate a WebSocket handshake. The collab WebSocket
+     * connects directly to the backend domain (Vercel cannot proxy WS), so the HttpOnly
+     * auth cookie is unavailable — the client fetches this ticket over the proxied REST
+     * API and passes it as a query parameter.
+     */
+    public String generateTicket(String email) {
+        Date now = new Date();
+        return Jwts.builder()
+                .setSubject(email)
+                .claim("ticket", true)
+                .setIssuedAt(now)
+                .setExpiration(new Date(now.getTime() + 120_000)) // 2 minutes
+                .signWith(key, SignatureAlgorithm.HS256)
+                .compact();
+    }
+
     public boolean valid(String token) {
         try {
             parse(token);

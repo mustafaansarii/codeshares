@@ -53,6 +53,14 @@ function App() {
           }
         />
         <Route
+          path="/problems/:id/collab/:sessionId"
+          element={
+            <PrivateRoute>
+              <ProblemEditorPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
           path="/profile"
           element={
             <PrivateRoute>

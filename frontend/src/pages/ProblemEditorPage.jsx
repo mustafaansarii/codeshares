@@ -1,13 +1,24 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Editor from '@monaco-editor/react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
-import { MdPlayArrow, MdCheck, MdArrowBack, MdCode, MdAccountCircle } from 'react-icons/md';
+import { MdPlayArrow, MdCheck, MdArrowBack, MdCode, MdAccountCircle, MdGroupAdd, MdContentCopy, MdClose } from 'react-icons/md';
+import { useCollab } from '../hooks/useCollab';
+import collabService from '../services/collab.service';
+import authService from '../services/auth.service';
 
 
 const PROBLEM_API = '/codeshare/api/problems';
 const CODE_API    = '/codeshare/api/problems';
+
+// Stable per-user cursor color derived from their email/name.
+const CURSOR_COLORS = ['#ef4444', '#f59e0b', '#10b981', '#3b82f6', '#8b5cf6', '#ec4899', '#14b8a6', '#f97316'];
+function colorFor(seed = '') {
+    let hash = 0;
+    for (let i = 0; i < seed.length; i++) hash = (hash * 31 + seed.charCodeAt(i)) | 0;
+    return CURSOR_COLORS[Math.abs(hash) % CURSOR_COLORS.length];
+}
 
 // ── Language config ───────────────────────────────────────────────────────────
 const LANGUAGES = [
@@ -85,7 +96,7 @@ function LoadingSkeleton() {
 
 // ── Main component ────────────────────────────────────────────────────────────
 function ProblemEditorPage() {
-    const { id } = useParams();
+    const { id, sessionId } = useParams();
     const navigate = useNavigate();
     const editorRef = useRef(null);
 
@@ -98,6 +109,50 @@ function ProblemEditorPage() {
     const [output,     setOutput]     = useState(null);
     const [activeTab,  setActiveTab]  = useState('description'); // 'description' | 'output'
     const [fontSize,   setFontSize]   = useState(14);
+
+    // ── collaboration ──────────────────────────────────────────────────────────
+    const collabMode = Boolean(sessionId);
+    const [editorInstance, setEditorInstance] = useState(null);
+    const [identity,        setIdentity]       = useState(null);
+    const [isOwner,         setIsOwner]         = useState(false);
+    const [shareOpen,       setShareOpen]       = useState(false);
+    const [inviting,        setInviting]        = useState(false);
+
+    // Resolve current user identity (name + stable color) for the remote cursor.
+    useEffect(() => {
+        let active = true;
+        authService.me()
+            .then((u) => {
+                const data = u?.data ?? u ?? {};
+                const name = data.fullName || data.email || 'Guest';
+                if (active) setIdentity({ name, email: data.email || '', color: colorFor(data.email || name) });
+            })
+            .catch(() => { if (active) setIdentity({ name: 'Guest', email: '', color: CURSOR_COLORS[0] }); });
+        return () => { active = false; };
+    }, []);
+
+    // In a shared session, find out whether we're the owner (only the owner seeds code).
+    useEffect(() => {
+        if (!sessionId || !identity) return;
+        collabService.getSession(sessionId)
+            .then((s) => setIsOwner((s.owner_email || '') === (identity.email || '')))
+            .catch(() => {});
+    }, [sessionId, identity]);
+
+    const collabUser = useMemo(
+        () => (identity
+            ? { name: identity.name, color: identity.color }
+            : { name: 'Guest', color: CURSOR_COLORS[0] }),
+        [identity],
+    );
+
+    const { connected, users } = useCollab({
+        editor: collabMode ? editorInstance : null,
+        sessionId: collabMode ? sessionId : null,
+        user: collabUser,
+        initialCode: code,
+        isOwner,
+    });
 
     // ── fetch problem ─────────────────────────────────────────────────────────
     useEffect(() => {
@@ -115,23 +170,44 @@ function ProblemEditorPage() {
     // ── language switch ───────────────────────────────────────────────────────
     const handleLanguageChange = (lang) => {
         setLanguage(lang);
-        setCode(TEMPLATES[lang.label] || '');
+        // In a shared session the document is owned by Yjs — don't clobber it with a template.
+        if (!collabMode) setCode(TEMPLATES[lang.label] || '');
     };
 
     // ── Monaco mount ─────────────────────────────────────────────────────────
     const handleEditorMount = (editor) => {
         editorRef.current = editor;
+        setEditorInstance(editor);
         editor.focus();
+    };
+
+    // Live source: in collab mode the model is driven by Yjs, so read it straight from Monaco.
+    const currentSource = () => editorRef.current?.getValue() ?? code;
+
+    // ── invite to collaborate ───────────────────────────────────────────────────
+    const handleInvite = async () => {
+        if (collabMode) { setShareOpen(true); return; }
+        setInviting(true);
+        try {
+            const session = await collabService.createSession(id, language.label);
+            navigate(`/problems/${id}/collab/${session.session_id}`);
+            setShareOpen(true);
+        } catch {
+            toast.error('Could not start a collab session');
+        } finally {
+            setInviting(false);
+        }
     };
 
     // ── run ───────────────────────────────────────────────────────────────────
     const handleRun = async () => {
-        if (!code.trim()) { toast.error('Write some code first'); return; }
+        const source = currentSource();
+        if (!source.trim()) { toast.error('Write some code first'); return; }
         setExecuting(true);
         setActiveTab('output');
         try {
             const { data } = await axios.post(`${CODE_API}/run`, {
-                code, language: language.label, problemId: Number(id), input: '', timeLimit: 5000,
+                code: source, language: language.label, problemId: Number(id), input: '', timeLimit: 5000,
             });
             const payload = data.data || data;
             setOutput({ type: 'run', ...payload });
@@ -144,12 +220,13 @@ function ProblemEditorPage() {
 
     // ── submit ────────────────────────────────────────────────────────────────
     const handleSubmit = async () => {
-        if (!code.trim()) { toast.error('Write some code first'); return; }
+        const source = currentSource();
+        if (!source.trim()) { toast.error('Write some code first'); return; }
         setSubmitting(true);
         setActiveTab('output');
         try {
             const { data } = await axios.post(`${CODE_API}/submit`, {
-                code, language: language.label, problemId: id,
+                code: source, language: language.label, problemId: id,
             });
             const payload = data.data || data;
             setOutput({ type: 'submit', ...payload });
@@ -201,8 +278,40 @@ function ProblemEditorPage() {
                     </button>
                 </div>
 
-                {/* Right — profile icon */}
-                <div className="flex justify-end">
+                {/* Right — participants, invite, profile */}
+                <div className="flex justify-end items-center gap-3">
+                    {collabMode && (
+                        <div className="flex items-center gap-2">
+                            {/* live presence avatars */}
+                            <div className="flex -space-x-2">
+                                {users.map((u, i) => (
+                                    <span
+                                        key={i}
+                                        title={u.name}
+                                        className="flex h-7 w-7 items-center justify-center rounded-full text-[11px] font-bold text-white ring-2 ring-slate-800"
+                                        style={{ backgroundColor: u.color }}
+                                    >
+                                        {(u.name || '?').charAt(0).toUpperCase()}
+                                    </span>
+                                ))}
+                            </div>
+                            <span
+                                title={connected ? 'Connected' : 'Connecting…'}
+                                className={`h-2 w-2 rounded-full ${connected ? 'bg-emerald-400' : 'bg-amber-400 animate-pulse'}`}
+                            />
+                        </div>
+                    )}
+
+                    <button
+                        onClick={handleInvite}
+                        disabled={inviting}
+                        title="Invite to collaborate"
+                        className="flex items-center gap-1.5 rounded-lg bg-indigo-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-indigo-700 disabled:opacity-40"
+                    >
+                        <MdGroupAdd className="h-4 w-4" />
+                        {inviting ? 'Starting…' : collabMode ? 'Share' : 'Invite'}
+                    </button>
+
                     <button
                         onClick={() => navigate('/profile')}
                         title="My Profile"
@@ -337,13 +446,24 @@ function ProblemEditorPage() {
                         </div>
                     </div>
 
+                    {/* Share modal */}
+                    {shareOpen && (
+                        <ShareModal
+                            link={`${window.location.origin}/problems/${id}/collab/${sessionId}`}
+                            onClose={() => setShareOpen(false)}
+                        />
+                    )}
+
                     {/* Monaco Editor */}
                     <div className="flex-1 overflow-hidden">
                         <Editor
                             height="100%"
                             language={language.monaco}
-                            value={code}
-                            onChange={v => setCode(v ?? '')}
+                            // In collab mode Yjs (via MonacoBinding) owns the document — go uncontrolled
+                            // so React's value prop doesn't fight the CRDT.
+                            {...(collabMode
+                                ? { defaultValue: '' }
+                                : { value: code, onChange: v => setCode(v ?? '') })}
                             onMount={handleEditorMount}
                             theme="vs-dark"
                             options={{
@@ -468,6 +588,56 @@ function OutputPanel({ output, executing, submitting }) {
     }
 
     return null;
+}
+
+// ── Share modal ─────────────────────────────────────────────────────────────────
+function ShareModal({ link, onClose }) {
+    const [copied, setCopied] = useState(false);
+
+    const copy = async () => {
+        try {
+            await navigator.clipboard.writeText(link);
+            setCopied(true);
+            toast.success('Link copied');
+            setTimeout(() => setCopied(false), 2000);
+        } catch {
+            toast.error('Could not copy');
+        }
+    };
+
+    return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onClick={onClose}>
+            <div
+                className="w-full max-w-md rounded-2xl bg-slate-800 p-6 ring-1 ring-slate-700"
+                onClick={e => e.stopPropagation()}
+            >
+                <div className="mb-4 flex items-center justify-between">
+                    <h3 className="text-lg font-bold text-white">Invite to collaborate</h3>
+                    <button onClick={onClose} className="text-slate-400 hover:text-white">
+                        <MdClose className="h-5 w-5" />
+                    </button>
+                </div>
+                <p className="mb-4 text-sm text-slate-400">
+                    Anyone with this link can join and edit the code with you in real time.
+                </p>
+                <div className="flex items-center gap-2 rounded-lg border border-slate-600 bg-slate-900 p-2">
+                    <input
+                        readOnly
+                        value={link}
+                        className="flex-1 bg-transparent px-2 text-xs text-slate-300 outline-none"
+                        onFocus={e => e.target.select()}
+                    />
+                    <button
+                        onClick={copy}
+                        className="flex items-center gap-1.5 rounded-md bg-indigo-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-indigo-700"
+                    >
+                        <MdContentCopy className="h-3.5 w-3.5" />
+                        {copied ? 'Copied' : 'Copy'}
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
 }
 
 export default ProblemEditorPage;
