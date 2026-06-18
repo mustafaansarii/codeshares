@@ -91,12 +91,13 @@ export default function Navbar() {
 
     return (
         <header className="sticky top-0 z-50 border-b border-white/10 bg-slate-950/80 backdrop-blur-xl">
-            <nav className="mx-auto flex h-16 max-w-7xl items-center px-4 sm:px-6 lg:px-8">
+            <nav className="relative mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
                 <button onClick={() => navigate('/')} className="flex items-center text-white outline-none">
-                    <BrandLogo size={30} />
+                    <BrandLogo size={40} />
                 </button>
 
-                <div className="ml-8 hidden items-center gap-1 md:flex">
+                {/* Centered nav links */}
+                <div className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-1 md:flex">
                     {visibleNavItems.map((item) => (
                         <NavLink key={item.label} to={item.to} className={linkClass}>
                             {item.label}
@@ -104,7 +105,7 @@ export default function Navbar() {
                     ))}
                 </div>
 
-                <div className="ml-auto flex items-center gap-3">
+                <div className="flex items-center gap-3">
                     {isAuthenticated ? (
                         <div className="hidden md:block"><ProfileMenu onLogout={handleLogout} /></div>
                     ) : (

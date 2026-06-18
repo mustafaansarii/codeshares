@@ -2,7 +2,7 @@
 // "Code" inherits currentColor (adapts to dark/light); "Share" is the brand blue accent.
 export default function BrandLogo({ className = '', showText = true, size = 32 }) {
     return (
-        <span className={`inline-flex items-center gap-2.5 ${className}`}>
+        <span className={`inline-flex items-center gap-1 ${className}`}>
             <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 64 64"
