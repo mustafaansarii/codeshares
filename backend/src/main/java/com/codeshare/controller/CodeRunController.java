@@ -19,8 +19,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.UUID;
-
 @Slf4j
 @RestController
 @RequestMapping("/api")
@@ -35,7 +33,7 @@ public class CodeRunController {
             @Valid @RequestBody CodeRunRequestForm request,
             HttpServletRequest httpRequest) {
 
-        UUID userId = (UUID) httpRequest.getAttribute("userId");
+        Long userId = (Long) httpRequest.getAttribute("userId");
         CodeRunResponseForm result = codeExecutionService.execute(request);
 
         log.info("Code execution: user={}, language={}, status={}",
