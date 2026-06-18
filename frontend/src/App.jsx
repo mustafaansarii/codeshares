@@ -8,6 +8,8 @@ import LoginPage from './pages/LoginPage';
 import ProfilePage from './pages/ProfilePage';
 import ProblemsPage from './pages/ProblemsPage';
 import ProblemEditorPage from './pages/ProblemEditorPage';
+import MyFilesPage from './pages/MyFilesPage';
+import FileEditorPage from './pages/FileEditorPage';
 import PrivateRoute from './components/route-manage/PrivateRoute';
 import Footer from './components/footer/Footer';
 import NotFound from './components/not-found/NotFound';
@@ -15,8 +17,8 @@ import authService from './services/auth.service';
 
 function App() {
   const location = useLocation();
-  const noFooterPaths = ['/login', '/profile', '/problems'];
-  const isEditorPage = location.pathname.match(/^\/problems\/\d+$/);
+  const noFooterPaths = ['/login', '/profile', '/problems', '/files'];
+  const isEditorPage = /^\/problems\/\d+/.test(location.pathname) || /^\/files\/.+/.test(location.pathname);
   const hideFooter = noFooterPaths.includes(location.pathname) || isEditorPage;
 
   const [authReady, setAuthReady] = useState(false);
@@ -57,6 +59,22 @@ function App() {
           element={
             <PrivateRoute>
               <ProblemEditorPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/files"
+          element={
+            <PrivateRoute>
+              <MyFilesPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/files/:fileId"
+          element={
+            <PrivateRoute>
+              <FileEditorPage />
             </PrivateRoute>
           }
         />

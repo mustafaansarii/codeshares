@@ -101,7 +101,7 @@ public class CodeExecutionService {
             CodeRunRequestForm request, Language language, int timeLimitMs, Path tempDir)
             throws IOException, InterruptedException {
 
-        Path sourceFile = writeSourceFile(tempDir, language, request.getCode());
+        Path sourceFile = writeSourceFile(tempDir, language, request.getCode(), request.isRaw());
         ExecutionResult compileResult = compileIfNeeded(language, sourceFile, timeLimitMs);
 
         if (compileResult != null && isCompilationFailed(compileResult)) {
@@ -141,8 +141,15 @@ public class CodeExecutionService {
     }
 
     private Path writeSourceFile(Path dir, Language language, String code) throws IOException {
+        return writeSourceFile(dir, language, code, false);
+    }
+
+    private Path writeSourceFile(Path dir, Language language, String code, boolean raw) throws IOException {
         Path file = dir.resolve(language.getSourceFileName());
-        Files.writeString(file, wrapWithHarness(language, code), StandardCharsets.UTF_8);
+        // Raw mode (playground): run the user's program verbatim. Otherwise wrap it in the
+        // Solution harness used by the problem flow.
+        String source = raw ? code : wrapWithHarness(language, code);
+        Files.writeString(file, source, StandardCharsets.UTF_8);
         return file;
     }
 

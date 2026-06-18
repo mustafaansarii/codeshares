@@ -20,4 +20,11 @@ public class CodeRunRequestForm {
     private String input;
 
     private int timeLimit;
+
+    /**
+     * When true the code is compiled/run as a complete standalone program (with its own
+     * {@code main}), reading {@link #input} from stdin — used by the file playground.
+     * When false (default) the code is wrapped in the Solution harness for the problem flow.
+     */
+    private boolean raw;
 }

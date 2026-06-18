@@ -17,6 +17,7 @@ const ICONS = {
 const navItems = [
     { label: 'Home', to: '/' },
     { label: 'Problems', to: '/problems' },
+    { label: 'Files', to: '/files', authRequired: true },
 ];
 
 const profileItems = [
