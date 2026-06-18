@@ -106,7 +106,7 @@ export default function FileEditorPage() {
         setOutput(null);
         try {
             const { data } = await axios.post(RUN_API, {
-                code, language: language.label, input, timeLimit: 5000, raw: true,
+                code, language: language.label, input, timeLimit: 15000, raw: true,
             });
             setOutput(data.data ?? data);
         } catch {
