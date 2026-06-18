@@ -1,6 +1,8 @@
 import axios from 'axios';
 
-const API_URL = '/codeshare/api/files/';
+// No trailing slash: collection calls use '' so axios hits exactly /api/files
+// (Spring Boot 3 doesn't match the trailing-slash variant).
+const API_URL = '/codeshare/api/files';
 
 const axiosInstance = axios.create({
     baseURL: API_URL,

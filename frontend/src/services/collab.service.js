@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-const API_URL = '/codeshare/api/collab/';
+// No trailing slash: createSession posts to '' so axios hits exactly /api/collab.
+const API_URL = '/codeshare/api/collab';
 
 // The collab WebSocket connects DIRECTLY to the backend — Vercel rewrites cannot proxy
 // WebSocket upgrades, so it can't go through the /codeshare path like the REST calls do.
