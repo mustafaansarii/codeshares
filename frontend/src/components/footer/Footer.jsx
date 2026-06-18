@@ -2,50 +2,51 @@ import { Link } from 'react-router-dom';
 import BrandLogo from '../shared/BrandLogo';
 
 export default function Footer() {
-    const links = {
-        product: [
-            { name: 'Home', url: '/' },
-            { name: 'Sign In', url: '/login' },
-        ],
-        account: [
-            { name: 'Sign In', url: '/login' },
-        ],
-        company: [
-            { name: 'Home', url: '/' },
-        ],
-    };
+    const columns = [
+        {
+            heading: 'Product',
+            items: [
+                { name: 'Problems', url: '/problems' },
+                { name: 'Files', url: '/files' },
+                { name: 'Sign in', url: '/login' },
+            ],
+        },
+        {
+            heading: 'Platform',
+            items: [
+                { name: 'Real-time collaboration', url: '/files' },
+                { name: 'Run code', url: '/problems' },
+            ],
+        },
+        {
+            heading: 'Account',
+            items: [
+                { name: 'My Profile', url: '/profile' },
+                { name: 'Sign in', url: '/login' },
+            ],
+        },
+    ];
 
     return (
-        <footer className="border-t-2 border-black">
-            <div className="relative w-full overflow-hidden border-b-2 border-black bg-white">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        <footer className="border-t border-white/10 bg-slate-950 text-slate-400">
+            <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
                 <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
-                    <div className="space-y-3 col-span-2 md:col-span-1">
-                        <Link to="/" className="flex items-center">
-                            <BrandLogo height={34} />
+                    <div className="col-span-2 space-y-3 md:col-span-1">
+                        <Link to="/" className="inline-flex items-center text-white">
+                            <BrandLogo size={28} />
                         </Link>
-                    <p className="text-sm text-slate-600 max-w-xs">
-                            Practice DSA problems and share code solutions instantly with your team.
-                        </p>
-                        <p className="hidden text-sm text-slate-400 md:block">
-                            © {new Date().getFullYear()} CodeShare. All rights reserved.
+                        <p className="max-w-xs text-sm text-slate-500">
+                            Practice, run, and collaborate on code in real time — all in your browser.
                         </p>
                     </div>
 
-                    {[
-                        { heading: 'Product', items: links.product },
-                        { heading: 'Account', items: links.account },
-                        { heading: 'Company', items: links.company },
-                    ].map(({ heading, items }) => (
+                    {columns.map(({ heading, items }) => (
                         <div key={heading} className="space-y-3">
-                            <h4 className="text-xs font-semibold uppercase tracking-widest sm:text-slate-900 text-white">{heading}</h4>
+                            <h4 className="text-xs font-semibold uppercase tracking-widest text-slate-500">{heading}</h4>
                             <ul className="space-y-2">
-                                {items.map(link => (
-                                    <li key={link.url}>
-                                        <Link
-                                            to={link.url}
-                                            className="text-sm text-black dark:text-black sm:text-white sm:dark:text-slate-100 transition hover:text-teal-600"
-                                        >
+                                {items.map((link) => (
+                                    <li key={link.name + link.url}>
+                                        <Link to={link.url} className="text-sm text-slate-400 transition hover:text-teal-300">
                                             {link.name}
                                         </Link>
                                     </li>
@@ -54,10 +55,11 @@ export default function Footer() {
                         </div>
                     ))}
                 </div>
-                <p className="mt-4 -mb-8 text-center text-sm text-slate-400 md:hidden">
-                    © {new Date().getFullYear()} CodeShare. All rights reserved.
-                </p>
-            </div>
+
+                <div className="mt-10 flex flex-col items-center justify-between gap-3 border-t border-white/10 pt-6 sm:flex-row">
+                    <p className="text-xs text-slate-500">© {new Date().getFullYear()} CodeShare. All rights reserved.</p>
+                    <p className="text-xs text-slate-600">Built for developers, by developers.</p>
+                </div>
             </div>
         </footer>
     );

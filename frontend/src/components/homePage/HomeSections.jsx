@@ -1,325 +1,205 @@
 import { useState } from 'react';
-import { MdArrowForward, MdStar } from 'react-icons/md';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
+import {
+    MdArrowForward, MdBolt, MdGroups, MdShare, MdViewList, MdTerminal, MdLock, MdExpandMore,
+} from 'react-icons/md';
 
 const MotionDiv = motion.div;
 
 const fadeUp = {
     hidden: { opacity: 0, y: 24 },
-    show: (i = 0) => ({ opacity: 1, y: 0, transition: { duration: 0.5, delay: i * 0.08 } }),
+    show: (i = 0) => ({ opacity: 1, y: 0, transition: { duration: 0.5, delay: i * 0.07 } }),
 };
 const viewport = { once: true, amount: 0.2 };
 
-const TRUST_LOGOS = ['Google', 'Amazon', 'Microsoft', 'Meta', 'Netflix', 'Stripe'];
+const LANGS = ['Python', 'Java', 'C++', 'C', 'Node.js'];
 
 const STATS = [
-    { value: '500K+', label: 'documents created', tint: 'bg-teal-50 text-teal-700 dark:bg-teal-500/10 dark:text-teal-300' },
-    { value: '40+', label: 'professional templates', tint: 'bg-indigo-50 text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-300' },
-    { value: '6 years', label: 'helping job seekers', tint: 'bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-300' },
-    { value: '98%', label: 'pass ATS checks', tint: 'bg-rose-50 text-rose-700 dark:bg-rose-500/10 dark:text-rose-300' },
+    { value: '5', label: 'languages, ready to run' },
+    { value: '0', label: 'setup — code in the browser' },
+    { value: '∞', label: 'live collaborators per file' },
+    { value: '1-click', label: 'shareable links' },
 ];
 
 const FEATURES = [
-    { title: 'AI-assisted writing', desc: 'Turn rough notes into polished, recruiter-ready bullet points in seconds.', path: 'M9.5 3a1 1 0 011 1 4 4 0 004 4 1 1 0 010 2 4 4 0 00-4 4 1 1 0 01-2 0 4 4 0 00-4-4 1 1 0 010-2 4 4 0 004-4 1 1 0 011-1z' },
-    { title: 'ATS-friendly', desc: 'Clean, parsable layouts that sail through applicant tracking systems.', path: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z' },
-    { title: 'Live PDF preview', desc: 'Edit on the left, watch your compiled PDF update live on the right.', path: 'M15 12a3 3 0 11-6 0 3 3 0 016 0zM2.5 12C3.7 7.9 7.5 5 12 5s8.3 2.9 9.5 7c-1.2 4.1-5 7-9.5 7s-8.3-2.9-9.5-7z' },
-    { title: 'Designer templates', desc: 'Dozens of professionally crafted templates for every document type.', path: 'M4 5a1 1 0 011-1h14a1 1 0 011 1v4H4V5zm0 6h7v9H5a1 1 0 01-1-1v-8zm9 0h7v8a1 1 0 01-1 1h-6v-9z' },
-];
-
-const ATS_PILLS = [
-    { title: 'Readable contact information', path: 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z' },
-    { title: 'Full experience parsing', path: 'M9 17v-6h13M9 7h13M5 7h.01M5 12h.01M5 17h.01' },
-    { title: 'Optimized skills section', path: 'M13 10V3L4 14h7v7l9-11h-7z' },
+    { icon: MdTerminal, title: 'Run in 5 languages', desc: 'Execute Python, Java, C, C++ and Node.js instantly — with your own stdin and live stdout/stderr.' },
+    { icon: MdGroups, title: 'Real-time collaboration', desc: 'Edit the same file together with live cursors and presence. Conflict-free, powered by CRDTs.' },
+    { icon: MdShare, title: 'Share with anyone', desc: 'Generate a link in one click. Grant view or edit access per person, or make a file public.' },
+    { icon: MdViewList, title: 'Curated DSA sheets', desc: 'Practice problems organized by topic and difficulty, with sample tests and full submissions.' },
+    { icon: MdBolt, title: 'Instant execution', desc: 'Sandboxed runs with enforced time and memory limits — see results in milliseconds.' },
+    { icon: MdLock, title: 'You control access', desc: 'Private by default. Public, view-only, or full edit — revoke anyone, anytime.' },
 ];
 
 const STEPS = [
-    { n: '01', title: 'Browse DSA Sheets', desc: 'Explore curated Data Structures & Algorithms problem sheets organized by difficulty and topics.' },
-    { n: '02', title: 'Create & Code', desc: 'Solve problems and create solution files with syntax highlighting and real-time preview.' },
-    { n: '03', title: 'Share & Collaborate', desc: 'Generate shareable links for your code files and collaborate with peers for reviews and learning.' },
-];
-
-const TEMPLATES = [
-    { name: 'Arrays & Strings', tag: 'DSA Sheet', to: '/login' },
-    { name: 'Trees & Graphs', tag: 'DSA Sheet', to: '/login' },
-    { name: 'Dynamic Programming', tag: 'DSA Sheet', to: '/login' },
-    { name: 'Sorting & Searching', tag: 'DSA Sheet', to: '/login' },
-];
-
-const REVIEWS = [
-    { name: 'Khushboo S.', when: '22 hours ago', stars: 5, text: 'The best CV building tool — tailored output for every job description, and the look and feel is truly dynamic.' },
-    { name: 'Virgil', when: '1 day ago', stars: 5, text: 'Very easy to draft a CV with lots of templates to choose from.' },
-    { name: 'Collins', when: '2 days ago', stars: 5, text: 'It aids in generating a good, outstanding, comprehensive resume.' },
-    { name: 'Aisha K.', when: '3 days ago', stars: 5, text: 'Rebuilt my resume in 20 minutes and started getting callbacks the same week.' },
-    { name: 'Roseline', when: '4 days ago', stars: 5, text: 'Nicely surprised by the professional level of the templates.' },
-    { name: 'Daniel R.', when: '5 days ago', stars: 4, text: 'Finally a builder that does not fight me on formatting. Genuinely professional.' },
+    { n: '01', title: 'Pick a problem or create a file', desc: 'Browse curated DSA sheets, or spin up a fresh file in any supported language.' },
+    { n: '02', title: 'Code together, live', desc: 'Invite teammates with a link and edit in real time — every keystroke syncs with live cursors.' },
+    { n: '03', title: 'Run, submit & share', desc: 'Run with custom input, submit against all test cases, and share your solution instantly.' },
 ];
 
 const FAQS = [
-    { q: 'Is CodeShare free to use?', a: 'Yes. You can practice DSA problems, create solution files, and share code with anyone completely free — no payment required.' },
-    { q: 'Do I need an account to practice DSA?', a: 'You can browse problems without an account, but creating an account lets you save your progress, track solutions, and generate shareable links for your code.' },
-    { q: 'Can I share my solutions with others?', a: 'Yes! Create a solution file for any problem and generate a shareable link. You can send it to teammates, friends, or instructors for feedback and collaboration.' },
-    { q: 'How secure is CodeShare?', a: 'CodeShare uses end-to-end encryption for all code shares. Your shared links are secure and can be revoked anytime — only people with the link can access your code.' },
-    { q: 'What programming languages are supported?', a: 'CodeShare supports all major programming languages including Python, Java, C++, JavaScript, Go, Rust, and many more — with syntax highlighting for each.' },
-    { q: 'Can I edit my shared code after sharing?', a: 'Yes! When you share a file, you retain full edit access. Changes are reflected in real-time for anyone viewing the shared link.' },
-    { q: 'Can I create my own problems and sheets?', a: 'Currently, CodeShare provides curated DSA sheets. You can solve and share your solutions. Custom problem creation is coming soon!' },
-    { q: 'How do I track my progress?', a: 'Your account dashboard shows all problems you have solved, solutions saved, and sharing history — helping you visualize your learning journey.' },
-    { q: 'How do I sign in or create an account?', a: 'You can sign in with Google or GitHub for instant account creation. No passwords to remember — just secure OAuth authentication.' },
-    { q: 'Can I download my solutions?', a: 'Yes. Download any solution file as plain code or with formatting. Export multiple solutions at once from your dashboard.' }
+    { q: 'Is CodeShare free to use?', a: 'Yes. Practice problems, create files, run code, and collaborate in real time — completely free.' },
+    { q: 'Which languages can I run?', a: 'Python, Java, C, C++, and Node.js — each compiled and executed in an isolated sandbox with time and memory limits.' },
+    { q: 'How does real-time collaboration work?', a: 'Open a file and share the link. Anyone with edit access joins the same live session — you see each other’s cursors and edits instantly, with no conflicts.' },
+    { q: 'Can I control who sees my code?', a: 'Absolutely. Files are private by default. You can make them public (view-only), or share with specific people as viewer or editor, and revoke access anytime.' },
+    { q: 'Can I run code with my own input?', a: 'Yes. The editor has a custom stdin panel — type any input your program reads and see the exact stdout, stderr, and exit code.' },
+    { q: 'How do I sign in?', a: 'Sign in instantly with Google or GitHub — secure OAuth, no passwords to remember.' },
 ];
 
 function FaqItem({ item, isOpen, onToggle }) {
     return (
-        <div className="rounded-2xl border-2 border-black bg-white transition hover:border-teal-300 dark:border-black dark:bg-white/5">
-            <button
-                onClick={onToggle}
-                className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left"
-                aria-expanded={isOpen}
-            >
-                <span className="text-sm font-semibold sm:text-base">{item.q}</span>
-                <MdArrowForward
-                    className={`h-5 w-5 shrink-0 text-teal-600 transition-transform duration-300 dark:text-teal-400 ${isOpen ? 'rotate-180' : ''}`}
-                />
+        <div className="rounded-2xl border border-white/10 bg-white/[0.03] transition hover:border-teal-400/30">
+            <button onClick={onToggle} className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left">
+                <span className="text-sm font-semibold text-white sm:text-base">{item.q}</span>
+                <MdExpandMore className={`h-5 w-5 shrink-0 text-teal-400 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
             </button>
-            <div className={`grid overflow-hidden px-5 transition-all duration-300 ease-in-out ${isOpen ? 'grid-rows-[1fr] pb-5 opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
+            <div className={`grid overflow-hidden px-5 transition-all duration-300 ${isOpen ? 'grid-rows-[1fr] pb-5 opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
                 <div className="overflow-hidden">
-                    <p className="text-sm leading-relaxed text-slate-500 dark:text-slate-400">{item.a}</p>
+                    <p className="text-sm leading-relaxed text-slate-400">{item.a}</p>
                 </div>
             </div>
-        </div>
-    );
-}
-
-function FaqSection() {
-    const [open, setOpen] = useState(0);
-    return (
-        <section className="border-t-2 border-black dark:border-black">
-            <div className="mx-auto max-w-3xl px-4 py-24 sm:px-6 lg:px-8">
-                <MotionDiv variants={fadeUp} initial="hidden" whileInView="show" viewport={viewport} className="text-center">
-                    <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">Frequently asked questions</h2>
-                    <p className="mt-4 text-base text-slate-500 dark:text-slate-400">Everything you need to know about sharing code with CodeShare.</p>
-                </MotionDiv>
-                <div className="mt-12 space-y-3">
-                    {FAQS.map((item, i) => (
-                        <FaqItem key={item.q} item={item} isOpen={open === i} onToggle={() => setOpen(open === i ? -1 : i)} />
-                    ))}
-                </div>
-            </div>
-        </section>
-    );
-}
-
-function FeatureIcon({ path }) {
-    return (
-        <div className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-xl bg-teal-50 text-teal-600 dark:bg-teal-500/10 dark:text-teal-300">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-6 w-6">
-                <path strokeLinecap="round" strokeLinejoin="round" d={path} />
-            </svg>
-        </div>
-    );
-}
-
-function Stars({ count = 5 }) {
-    return (
-        <div className="flex gap-0.5">
-            {Array.from({ length: 5 }).map((_, i) => (
-                <span key={i} className={`flex h-5 w-5 items-center justify-center rounded ${i < count ? 'bg-teal-500' : 'bg-slate-200 dark:bg-white/10'}`}>
-                    <MdStar className="h-3 w-3 text-white" />
-                </span>
-            ))}
         </div>
     );
 }
 
 export default function HomeSections() {
-    return (
-        <div className="text-slate-900">
+    const [open, setOpen] = useState(0);
 
-            <section className="border-b-2 border-black dark:border-black">
+    return (
+        <div className="bg-slate-950 text-white">
+            {/* ── language strip ── */}
+            <section className="border-y border-white/10">
                 <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
-                    <p className="text-center text-xs font-semibold uppercase tracking-widest text-slate-400">
-                        Trusted by job seekers hired at
+                    <p className="text-center text-xs font-semibold uppercase tracking-widest text-slate-500">
+                        Write and run in your language
                     </p>
                     <div className="mt-6 flex flex-wrap items-center justify-center gap-x-10 gap-y-4">
-                        {TRUST_LOGOS.map((logo) => (
-                            <span key={logo} className="text-lg font-bold tracking-tight text-slate-400/80 dark:text-slate-500">{logo}</span>
+                        {LANGS.map((l) => (
+                            <span key={l} className="font-mono text-lg font-bold tracking-tight text-slate-400">{l}</span>
                         ))}
                     </div>
                 </div>
             </section>
 
-            <section className="mx-auto max-w-7xl px-4 py-24 sm:px-6 lg:px-8">
-                <div className="grid items-center gap-12 lg:grid-cols-2">
-                    <div className="grid grid-cols-2 gap-5">
-                        {STATS.map((s, i) => (
-                            <MotionDiv
-                                key={s.label}
-                                custom={i}
-                                variants={fadeUp}
-                                initial="hidden"
-                                whileInView="show"
-                                viewport={viewport}
-                                className={`rounded-3xl p-7 ${s.tint} ${i % 2 === 1 ? 'mt-8' : ''}`}
-                            >
-                                <p className="text-4xl font-extrabold tracking-tight sm:text-5xl">{s.value}</p>
-                                <p className="mt-2 text-sm font-medium opacity-80">{s.label}</p>
-                            </MotionDiv>
-                        ))}
-                    </div>
-
-                    <MotionDiv variants={fadeUp} initial="hidden" whileInView="show" viewport={viewport}>
-                        <h2 className="text-3xl font-bold leading-tight tracking-tight sm:text-4xl">
-                            Chosen by <span className="text-teal-600 dark:text-teal-400">thousands</span> of job applicants worldwide
-                        </h2>
-                        <p className="mt-5 text-base leading-relaxed text-slate-500 dark:text-slate-400">
-                            CodeShare is a code sharing platform that helps you collaborate efficiently with your team — trusted for sharing code snippets, technical reviews, and real-time collaboration.
-                        </p>
-                        <p className="mt-4 text-base leading-relaxed text-slate-500 dark:text-slate-400">
-                            We pair flexible, ATS-friendly templates with an intuitive editor and a live PDF preview, so you can present a complete, polished application in minutes.
-                        </p>
-                        <Link to="/login" className="mt-7 inline-flex items-center gap-1.5 text-sm font-semibold text-teal-600 hover:text-teal-700 dark:text-teal-400">
-                            Explore templates
-                            <MdArrowForward className="h-4 w-4" />
-                        </Link>
-                    </MotionDiv>
+            {/* ── stats ── */}
+            <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+                <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+                    {STATS.map((s, i) => (
+                        <MotionDiv key={s.label} custom={i} variants={fadeUp} initial="hidden" whileInView="show" viewport={viewport}
+                            className="rounded-2xl border border-white/10 bg-white/[0.03] p-6 text-center">
+                            <p className="bg-gradient-to-r from-teal-300 to-cyan-400 bg-clip-text text-4xl font-extrabold tracking-tight text-transparent sm:text-5xl">{s.value}</p>
+                            <p className="mt-2 text-sm text-slate-400">{s.label}</p>
+                        </MotionDiv>
+                    ))}
                 </div>
             </section>
 
-            <section className="border-y-2 border-black dark:border-black">
-                <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
+            {/* ── features ── */}
+            <section className="border-t border-white/10">
+                <div className="mx-auto max-w-7xl px-4 py-24 sm:px-6 lg:px-8">
                     <div className="mx-auto max-w-2xl text-center">
-                        <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">Everything you need to get hired</h2>
-                        <p className="mt-4 text-base text-slate-500 dark:text-slate-400">The builder handles design and formatting, so you can focus on the words that land the job.</p>
+                        <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">Everything you need to code together</h2>
+                        <p className="mt-4 text-base text-slate-400">From solo practice to live pair-programming — one fast, browser-based workspace.</p>
                     </div>
-                    <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                    <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
                         {FEATURES.map((f, i) => (
                             <MotionDiv key={f.title} custom={i} variants={fadeUp} initial="hidden" whileInView="show" viewport={viewport}
-                                className="rounded-2xl border-2 border-black bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-lg dark:border-black dark:bg-white/5">
-                                <FeatureIcon path={f.path} />
-                                <h3 className="text-base font-semibold">{f.title}</h3>
-                                <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">{f.desc}</p>
+                                className="group rounded-2xl border border-white/10 bg-white/[0.03] p-6 transition hover:-translate-y-1 hover:border-teal-400/30 hover:bg-white/[0.05]">
+                                <div className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-xl bg-teal-400/10 text-teal-300 transition group-hover:bg-teal-400/20">
+                                    <f.icon className="h-6 w-6" />
+                                </div>
+                                <h3 className="text-base font-semibold text-white">{f.title}</h3>
+                                <p className="mt-2 text-sm leading-relaxed text-slate-400">{f.desc}</p>
                             </MotionDiv>
                         ))}
                     </div>
                 </div>
             </section>
 
-            <section className="mx-auto max-w-7xl px-4 py-24 sm:px-6 lg:px-8">
-                <div className="relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-slate-900 via-indigo-900 to-teal-800 px-6 py-14 sm:px-12 lg:py-20">
-                    <div className="pointer-events-none absolute -right-20 -top-20 h-72 w-72 rounded-full bg-teal-400/20 blur-3xl" />
-                    <div className="pointer-events-none absolute -bottom-24 left-10 h-72 w-72 rounded-full bg-indigo-400/20 blur-3xl" />
-                    <div className="relative grid items-center gap-12 lg:grid-cols-2">
-                        <MotionDiv variants={fadeUp} initial="hidden" whileInView="show" viewport={viewport}>
-                            <h2 className="text-3xl font-bold leading-tight tracking-tight text-white sm:text-4xl">
-                                Resumes optimized for Applicant Tracking Systems
+            {/* ── collaboration highlight ── */}
+            <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+                <div className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-gradient-to-br from-slate-900 via-slate-900 to-teal-950/40 px-6 py-14 sm:px-12 lg:py-20">
+                    <div className="pointer-events-none absolute -right-20 -top-20 h-72 w-72 rounded-full bg-teal-400/15 blur-3xl" />
+                    <div className="pointer-events-none absolute -bottom-24 left-10 h-72 w-72 rounded-full bg-violet-500/15 blur-3xl" />
+                    <div className="relative grid items-center gap-10 lg:grid-cols-2">
+                        <div>
+                            <span className="inline-flex items-center gap-2 rounded-full border border-violet-400/30 bg-violet-400/10 px-3 py-1 text-xs font-semibold text-violet-300">
+                                <MdGroups className="h-3.5 w-3.5" /> Live collaboration
+                            </span>
+                            <h2 className="mt-4 text-3xl font-bold leading-tight tracking-tight sm:text-4xl">
+                                Pair-program from anywhere, in real time
                             </h2>
-                            <p className="mt-5 max-w-lg text-base leading-relaxed text-slate-300">
-                                Every template is tested against top ATS software for full compatibility — clean layouts, readable fonts, and standard section titles, so nothing gets lost.
+                            <p className="mt-5 max-w-lg text-base leading-relaxed text-slate-400">
+                                Share a link and code on the same file together. Every keystroke syncs instantly with
+                                live cursors and presence — perfect for interviews, mentoring, and reviews.
                             </p>
-                            <Link to="/login" className="mt-8 inline-flex items-center gap-1.5 rounded-full bg-teal-500 px-6 py-3 text-sm font-semibold text-white shadow-lg transition hover:bg-teal-400">
-                                Build an ATS-friendly resume
-                                <MdArrowForward className="h-4 w-4" />
+                            <Link to="/files" className="mt-8 inline-flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-teal-400 to-cyan-500 px-6 py-3 text-sm font-semibold text-slate-950 transition hover:shadow-[0_0_24px_-4px_rgba(45,212,191,0.6)]">
+                                Open a collaborative file <MdArrowForward className="h-4 w-4" />
                             </Link>
-                        </MotionDiv>
-
-                        <div className="space-y-4">
-                            {ATS_PILLS.map((p, i) => (
-                                <MotionDiv key={p.title} custom={i} variants={fadeUp} initial="hidden" whileInView="show" viewport={viewport}
-                                    className={`flex items-center gap-4 rounded-2xl border border-2 border-black bg-white/10 p-4 backdrop-blur-sm ${i === 1 ? 'lg:ml-12' : i === 2 ? 'lg:ml-6' : ''}`}>
-                                    <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white text-indigo-600">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-6 w-6"><path strokeLinecap="round" strokeLinejoin="round" d={p.path} /></svg>
-                                    </span>
-                                    <span className="text-sm font-semibold text-white">{p.title}</span>
-                                </MotionDiv>
-                            ))}
+                        </div>
+                        <div className="rounded-2xl border border-white/10 bg-slate-950/60 p-5 font-mono text-[13px] leading-7 text-slate-300 shadow-xl">
+                            <p><span className="text-slate-600">1</span>  <span className="text-violet-300">function</span> <span className="text-teal-300">merge</span>(a, b) {'{'}</p>
+                            <p><span className="text-slate-600">2</span>    <span className="text-violet-300">return</span> [...a, ...b].sort()</p>
+                            <p className="relative"><span className="text-slate-600">3</span>  {'}'}<span className="ml-1 inline-block h-4 w-0.5 animate-pulse bg-teal-400 align-middle" /><span className="ml-1 rounded bg-teal-500 px-1.5 text-[10px] text-slate-950">You</span></p>
+                            <p className="mt-3 flex items-center gap-2 text-xs text-slate-500">
+                                <span className="grid h-5 w-5 place-items-center rounded-full bg-violet-500 text-[9px] font-bold text-white">A</span>
+                                Alice joined · editing line 2
+                            </p>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <section className="mx-auto max-w-7xl px-4 pb-8 sm:px-6 lg:px-8">
+            {/* ── how it works ── */}
+            <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
                 <div className="mx-auto max-w-2xl text-center">
-                    <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">From blank page to PDF in 3 steps</h2>
+                    <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">From problem to solution in 3 steps</h2>
                 </div>
                 <div className="mt-14 grid gap-8 md:grid-cols-3">
                     {STEPS.map((s, i) => (
-                        <MotionDiv key={s.n} custom={i} variants={fadeUp} initial="hidden" whileInView="show" viewport={viewport}>
-                            <span className="text-5xl font-extrabold text-teal-500/25 dark:text-teal-400/25">{s.n}</span>
-                            <h3 className="mt-3 text-lg font-semibold">{s.title}</h3>
-                            <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">{s.desc}</p>
+                        <MotionDiv key={s.n} custom={i} variants={fadeUp} initial="hidden" whileInView="show" viewport={viewport}
+                            className="rounded-2xl border border-white/10 bg-white/[0.03] p-7">
+                            <span className="bg-gradient-to-br from-teal-300/40 to-cyan-400/20 bg-clip-text font-mono text-5xl font-extrabold text-transparent">{s.n}</span>
+                            <h3 className="mt-3 text-lg font-semibold text-white">{s.title}</h3>
+                            <p className="mt-2 text-sm leading-relaxed text-slate-400">{s.desc}</p>
                         </MotionDiv>
                     ))}
                 </div>
             </section>
 
-            <section className="relative overflow-hidden mx-auto max-w-7xl px-4 py-24 sm:px-6 lg:px-8">
-                <div className="pointer-events-none absolute left-1/2 top-32 -z-10 h-72 w-[60%] -translate-x-1/2 rounded-full bg-teal-500/10 blur-3xl" />
-                <div className="flex flex-col items-end justify-between gap-6 sm:flex-row">
-                    <div className="max-w-xl">
-                        <span className="inline-flex items-center rounded-full bg-teal-50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-teal-700 dark:bg-teal-500/10 dark:text-teal-300">
-                            Templates
-                        </span>
-                        <h2 className="mt-4 text-3xl font-bold tracking-tight sm:text-4xl">Templates that recruiters love</h2>
-                        <p className="mt-4 text-base text-slate-500 dark:text-slate-400">Field-tested, ATS-safe, and fully editable. Pick one and make it yours.</p>
+            {/* ── FAQ ── */}
+            <section className="border-t border-white/10">
+                <div className="mx-auto max-w-3xl px-4 py-24 sm:px-6 lg:px-8">
+                    <div className="text-center">
+                        <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">Frequently asked questions</h2>
+                        <p className="mt-4 text-base text-slate-400">Everything you need to know to get started.</p>
                     </div>
-                    <Link to="/login" className="group inline-flex shrink-0 items-center gap-1.5 rounded-full border border-teal-500/40 px-5 py-2.5 text-sm font-semibold text-teal-600 transition hover:bg-teal-500 hover:text-white dark:text-teal-400">
-                        Browse all templates
-                        <MdArrowForward className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-                    </Link>
-                </div>
-
-                <div className="mx-auto mt-14 grid max-w-8xl grid-cols-2 gap-6 sm:grid-cols-4">
-                    {TEMPLATES.map((t, i) => (
-                        <MotionDiv key={t.name} custom={i} variants={fadeUp} initial="hidden" whileInView="show" viewport={viewport}>
-                            <div className="overflow-hidden bg-gradient-to-br from-teal-50 to-cyan-50 shadow-md ring-1 ring-slate-200 h-48 rounded-lg flex items-center justify-center">
-                                <div className="text-center space-y-2">
-                                    <div className="text-2xl font-bold text-teal-600">{t.name}</div>
-                                    <div className="text-sm text-slate-600">{t.tag}</div>
-                                </div>
-                            </div>
-                        </MotionDiv>
-                    ))}
-                </div>
-            </section>
-
-            <section className="relative overflow-hidden border-y-2 border-black dark:border-black">
-
-                <div
-                    className="pointer-events-none absolute left-1/2 top-1/2 -z-10 h-[120%] w-[85%] -translate-x-1/2 -translate-y-1/2 rounded-[45%] blur-[90px] opacity-70 dark:opacity-40"
-                    style={{ background: 'conic-gradient(from 140deg at 50% 50%, #fcd34d, #fb7185, #e879f9, #a78bfa, #818cf8, #38bdf8, #5eead4, #fcd34d)' }}
-                />
-
-                <div className="pointer-events-none absolute -left-24 bottom-0 -z-10 h-72 w-72 rounded-full bg-sky-300/40 blur-3xl dark:bg-sky-500/20" />
-                <div className="pointer-events-none absolute -right-20 top-10 -z-10 h-72 w-72 rounded-full bg-rose-300/40 blur-3xl dark:bg-rose-500/20" />
-                <div className="mx-auto max-w-7xl px-4 py-24 sm:px-6 lg:px-8">
-                    <div className="grid items-start gap-8 lg:grid-cols-[1fr_1.4fr]">
-                        <div className="lg:sticky lg:top-24">
-                            <h2 className="text-3xl font-bold leading-tight tracking-tight sm:text-4xl">Trusted by executives &amp; senior professionals</h2>
-                            <div className="mt-6 inline-flex items-center gap-3 rounded-2xl bg-white/80 px-5 py-4 shadow-sm backdrop-blur dark:bg-white/10">
-                                <Stars count={5} />
-                                <div>
-                                    <p className="text-lg font-bold">4.8 / 5</p>
-                                    <p className="text-xs text-slate-500 dark:text-slate-400">5,270+ happy customers</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="columns-1 gap-5 sm:columns-2 [&>*]:mb-5">
-                            {REVIEWS.map((r, i) => (
-                                <MotionDiv key={r.name} custom={i % 3} variants={fadeUp} initial="hidden" whileInView="show" viewport={viewport}
-                                    className="break-inside-avoid rounded-2xl border border-2 border-black bg-white p-5 shadow-sm dark:border-black dark:bg-white/5">
-                                    <Stars count={r.stars} />
-                                    <p className="mt-2 text-xs text-slate-400">{r.when}</p>
-                                    <p className="mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-300">{r.text}</p>
-                                    <p className="mt-4 text-sm font-semibold">— {r.name}</p>
-                                </MotionDiv>
-                            ))}
-                        </div>
+                    <div className="mt-12 space-y-3">
+                        {FAQS.map((item, i) => (
+                            <FaqItem key={item.q} item={item} isOpen={open === i} onToggle={() => setOpen(open === i ? -1 : i)} />
+                        ))}
                     </div>
                 </div>
             </section>
 
-            <FaqSection />
+            {/* ── final CTA ── */}
+            <section className="mx-auto max-w-7xl px-4 pb-24 sm:px-6 lg:px-8">
+                <div className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-gradient-to-br from-teal-500/10 via-slate-900 to-violet-500/10 px-6 py-16 text-center">
+                    <div className="pointer-events-none absolute left-1/2 top-0 h-64 w-[60%] -translate-x-1/2 rounded-full bg-teal-400/15 blur-3xl" />
+                    <h2 className="relative text-3xl font-bold tracking-tight sm:text-4xl">Ready to write some code?</h2>
+                    <p className="relative mx-auto mt-4 max-w-xl text-base text-slate-400">
+                        Jump into a problem or start a collaborative file — no setup, no install, just code.
+                    </p>
+                    <div className="relative mt-8 flex flex-wrap justify-center gap-3">
+                        <Link to="/problems" className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-teal-400 to-cyan-500 px-6 py-3 text-sm font-semibold text-slate-950 transition hover:shadow-[0_0_28px_-4px_rgba(45,212,191,0.7)]">
+                            Start solving <MdArrowForward className="h-4 w-4" />
+                        </Link>
+                        <Link to="/login" className="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/5 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/10">
+                            Sign in with Google / GitHub
+                        </Link>
+                    </div>
+                </div>
+            </section>
         </div>
     );
 }

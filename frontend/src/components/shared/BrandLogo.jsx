@@ -1,74 +1,22 @@
-export default function BrandLogo({ height = 60, className = "" }) {
-  return (
-    <svg
-      width={height * 5}
-      height={height}
-      viewBox="0 0 1000 200"
-      xmlns="http://www.w3.org/2000/svg"
-      className={className}
-      fill="none"
-    >
-      {/* Document Icon */}
-      <g transform="translate(10,25)">
-        <path
-          d="M20 0 H90 L120 30 V150 H20 Z"
-          stroke="currentColor"
-          strokeWidth="4"
-          fill="none"
-          strokeLinejoin="round"
-        />
-
-        <path
-          d="M90 0 V30 H120"
-          stroke="currentColor"
-          strokeWidth="4"
-          fill="none"
-          strokeLinejoin="round"
-        />
-
-        <line
-          x1="40"
-          y1="55"
-          x2="100"
-          y2="55"
-          stroke="currentColor"
-          strokeWidth="5"
-          strokeLinecap="round"
-        />
-
-        <line
-          x1="40"
-          y1="85"
-          x2="100"
-          y2="85"
-          stroke="currentColor"
-          strokeWidth="5"
-          strokeLinecap="round"
-        />
-
-        <line
-          x1="40"
-          y1="115"
-          x2="80"
-          y2="115"
-          stroke="currentColor"
-          strokeWidth="5"
-          strokeLinecap="round"
-        />
-      </g>
-
-      {/* CodeShare Text */}
-      <text
-        x="170"
-        y="145"
-        fontSize="110"
-        fontWeight="100"
-        fontFamily="Inter, Poppins, Arial, sans-serif"
-        letterSpacing="-2"
-        fill="currentColor"
-      >
-        CodeShare
-      </text>
-    </svg>
-  );
+export default function BrandLogo({ className = '', showText = true, size = 32 }) {
+    return (
+        <span className={`inline-flex items-center gap-2.5 ${className}`}>
+            <span
+                className="relative grid place-items-center rounded-xl bg-gradient-to-br from-teal-300 to-cyan-500 text-slate-950 shadow-[0_0_22px_-4px_rgba(45,212,191,0.7)]"
+                style={{ height: size, width: size }}
+            >
+                <svg viewBox="0 0 24 24" width={size * 0.62} height={size * 0.62} fill="none"
+                    stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M8.5 8.5 5 12l3.5 3.5" />
+                    <path d="M15.5 8.5 19 12l-3.5 3.5" />
+                    <path d="M13.5 6.5 10.5 17.5" />
+                </svg>
+            </span>
+            {showText && (
+                <span className="text-[1.15rem] font-bold leading-none tracking-tight">
+                    Code<span className="text-teal-400">Share</span>
+                </span>
+            )}
+        </span>
+    );
 }

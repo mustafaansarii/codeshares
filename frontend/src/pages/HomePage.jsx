@@ -4,16 +4,12 @@ import HomeSections from '../components/homePage/HomeSections';
 
 function HomePage() {
     return (
-        <>
-            <div className="relative w-full overflow-hidden border-b-2 border-black">
-                <Navbar />
-                <div className="mx-4 sm:mx-6 lg:mx-8 border-l-2 border-r-2 border-black">
-                    <Hero />
-                </div>
-            </div>
+        <div className="min-h-screen bg-slate-950">
+            <Navbar />
+            <Hero />
             <HomeSections />
-        </>
-    )
+        </div>
+    );
 }
 
 export default HomePage;
