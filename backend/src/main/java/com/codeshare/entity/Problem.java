@@ -2,6 +2,7 @@ package com.codeshare.entity;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -14,7 +15,9 @@ import lombok.Data;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Data
 @Entity
@@ -45,6 +48,15 @@ public class Problem {
 
     @Column(name = "sheet_name")
     private String sheetName;
+
+    /**
+     * Visible per-language helper/driver snippet shown in the editor. It reads the test
+     * input and calls the user's function with parsed parameters, so the user only fills
+     * in the function body. Keyed by language label (e.g. "Java"); stored as JSON.
+     */
+    @Convert(converter = StringMapConverter.class)
+    @Column(name = "starter_code", columnDefinition = "TEXT")
+    private Map<String, String> starterCode = new HashMap<>();
 
     @OneToMany(mappedBy = "problem", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<TestCase> testCases = new ArrayList<>();

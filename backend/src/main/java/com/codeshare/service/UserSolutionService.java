@@ -1,5 +1,6 @@
 package com.codeshare.service;
 
+import com.codeshare.dto.ProblemProgressDto;
 import com.codeshare.dto.TestCaseResultDto;
 import com.codeshare.dto.UserSolutionRequestDto;
 import com.codeshare.dto.UserSolutionResponseDto;
@@ -32,6 +33,19 @@ public class UserSolutionService {
     private final ProblemRepository problemRepository;
     private final TestCaseRepository testCaseRepository;
     private final CodeExecutionService codeExecutionService;
+
+    /** Per-problem attempted/solved status + timestamp for the given user. */
+    @Transactional(readOnly = true)
+    public List<ProblemProgressDto> getProgress(Long userId) {
+        return solutionRepository.findByUserId(userId).stream()
+                .map(s -> new ProblemProgressDto(
+                        s.getProblem().getId(),
+                        s.getStatus(),
+                        "ACCEPTED".equals(s.getStatus()),
+                        true,
+                        s.getUpdatedAt()))
+                .collect(Collectors.toList());
+    }
 
     @Transactional
     public UserSolutionResponseDto runSampleTestCases(
@@ -119,11 +133,18 @@ public class UserSolutionService {
     }
 
     private ExecutionResult executeTestCase(UserSolution solution, TestCase testCase, Problem problem) {
+        // When the problem ships a visible per-language helper snippet, the user's code is a
+        // complete program (helper + their function), so run it raw. Otherwise fall back to the
+        // legacy Solution.solve() harness.
+        boolean raw = problem.getStarterCode() != null
+                && problem.getStarterCode().containsKey(solution.getLanguage());
+
         CodeRunRequestForm request = CodeRunRequestForm.builder()
                 .code(solution.getCode())
                 .language(solution.getLanguage())
                 .input(testCase.getInputData())
                 .timeLimit(problem.getTimeLimit() > 0 ? problem.getTimeLimit() : 5000)
+                .raw(raw)
                 .build();
 
         return codeExecutionService.executeForComparison(request, testCase.getExpectedOutput());

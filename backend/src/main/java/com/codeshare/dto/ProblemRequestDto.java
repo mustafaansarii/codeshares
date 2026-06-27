@@ -34,6 +34,10 @@ public class ProblemRequestDto {
     @JsonProperty("sheet_name")
     private String sheetName;
 
+    /** Per-language visible helper snippet shown in the editor. */
+    @JsonProperty("starter_code")
+    private java.util.Map<String, String> starterCode;
+
     @NotEmpty(message = "At least one test case is required")
     @Valid
     private List<TestCaseDto> testCases;

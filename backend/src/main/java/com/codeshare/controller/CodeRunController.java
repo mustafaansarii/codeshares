@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -82,5 +83,13 @@ public class CodeRunController {
         UserSolutionResponseDto result = userSolutionService.getUserSolution(user.getId(), request.getProblemId());
 
         return ResponseEntity.ok(ApiResponse.success(result));
+    }
+
+    /** Current user's attempted/solved status across all problems. */
+    @GetMapping("/problems/progress")
+    public ResponseEntity<ApiResponse<java.util.List<com.codeshare.dto.ProblemProgressDto>>> progress(
+            HttpServletRequest httpRequest) {
+        AuthUser user = (AuthUser) httpRequest.getAttribute("user");
+        return ResponseEntity.ok(ApiResponse.success(userSolutionService.getProgress(user.getId())));
     }
 }

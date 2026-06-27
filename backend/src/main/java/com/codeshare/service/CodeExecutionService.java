@@ -63,7 +63,7 @@ public class CodeExecutionService {
 
             Path tempDir = Files.createTempDirectory("code-run-");
             try {
-                Path sourceFile = writeSourceFile(tempDir, language, request.getCode());
+                Path sourceFile = writeSourceFile(tempDir, language, request.getCode(), request.isRaw());
                 ExecutionResult compileResult = compileIfNeeded(language, sourceFile, timeLimitMs);
 
                 if (compileResult != null && isCompilationFailed(compileResult)) {

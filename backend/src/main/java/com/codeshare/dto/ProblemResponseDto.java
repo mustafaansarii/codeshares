@@ -27,6 +27,9 @@ public class ProblemResponseDto {
     @JsonProperty("sheet_name")
     private String sheetName;
 
+    @JsonProperty("starter_code")
+    private java.util.Map<String, String> starterCode;
+
     @JsonProperty("test_cases")
     private List<TestCaseDto> testCases;
 

@@ -44,6 +44,7 @@ public class ProblemService {
                     .language(request.getLanguage())
                     .input(tc.getInputData())
                     .timeLimit(15000)
+                    .raw(true) // reference solution is a complete helper-based program
                     .build();
 
             ExecutionResult result =
@@ -151,6 +152,8 @@ public class ProblemService {
         problem.setTimeLimit(requestDto.getTimeLimit());
         problem.setMemoryLimit(requestDto.getMemoryLimit());
         problem.setSheetName(requestDto.getSheetName());
+        problem.setStarterCode(requestDto.getStarterCode() != null
+                ? requestDto.getStarterCode() : new java.util.HashMap<>());
     }
 
     private void saveTestCases(ProblemRequestDto requestDto, Problem problem) {
@@ -196,6 +199,7 @@ public class ProblemService {
         dto.setTimeLimit(problem.getTimeLimit());
         dto.setMemoryLimit(problem.getMemoryLimit());
         dto.setSheetName(problem.getSheetName());
+        dto.setStarterCode(problem.getStarterCode());
         dto.setCreatedAt(problem.getCreatedAt());
         dto.setUpdatedAt(problem.getUpdatedAt());
         dto.setTestCases(mapTestCasesToDtoList(problem.getTestCases()));

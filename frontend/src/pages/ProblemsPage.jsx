@@ -2,6 +2,8 @@ import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Navbar from '../components/navbar/Navbar';
+import authService from '../services/auth.service';
+import problemsService from '../services/problems.service';
 
 const API = '/codeshare/api/problems';
 
@@ -40,6 +42,7 @@ export default function ProblemsPage() {
     const [totalItems, setTotalItems] = useState(0);
     const [loading, setLoading]     = useState(true);
     const [sheets, setSheets]       = useState([]);   // unique sheet names
+    const [progress, setProgress]   = useState({});   // problemId -> { solved, attempted }
 
     const debouncedKeyword = useDebounce(keyword);
 
@@ -74,6 +77,16 @@ export default function ProblemsPage() {
                 (data.data ?? []).map(p => p.sheet_name).filter(Boolean)
             )].sort();
             setSheets(names);
+        }).catch(() => {});
+    }, []);
+
+    // fetch this user's attempted/solved status (badges)
+    useEffect(() => {
+        if (!authService.isAuthenticated()) return;
+        problemsService.progress().then((rows) => {
+            const map = {};
+            (rows ?? []).forEach((r) => { map[r.problem_id] = { solved: r.solved, attempted: r.attempted }; });
+            setProgress(map);
         }).catch(() => {});
     }, []);
 
@@ -204,8 +217,15 @@ export default function ProblemsPage() {
                                             {page * size + i + 1}
                                         </td>
                                         <td className="px-4 py-4">
-                                            <span className="font-semibold text-ink group-hover:text-clay-strong transition-colors">
-                                                {p.title}
+                                            <span className="flex items-center gap-2">
+                                                <span className="font-semibold text-ink group-hover:text-clay-strong transition-colors">
+                                                    {p.title}
+                                                </span>
+                                                {progress[p.id]?.solved ? (
+                                                    <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-bold text-emerald-700">✓ Solved</span>
+                                                ) : progress[p.id]?.attempted ? (
+                                                    <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-700">Attempted</span>
+                                                ) : null}
                                             </span>
                                         </td>
                                         <td className="px-4 py-4 text-ink-muted">

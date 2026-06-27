@@ -52,6 +52,12 @@ class ProblemsService {
         return response.data;
     }
 
+    /** Current user's attempted/solved status across all problems. */
+    async progress() {
+        const response = await axiosInstance.get('progress');
+        return response.data.data ?? response.data;
+    }
+
     /** Admin: dry-run a reference solution against candidate test cases (no save). */
     async validate({ code, language, testCases }) {
         const response = await axiosInstance.post('validate', {

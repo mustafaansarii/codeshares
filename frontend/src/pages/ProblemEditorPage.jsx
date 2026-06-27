@@ -75,6 +75,11 @@ const DIFF_STYLE = {
     HARD:   'text-red-400',
 };
 
+
+function starterFor(problem, label) {
+    return problem?.starter_code?.[label] ?? TEMPLATES[label] ?? '';
+}
+
 // ── Skeleton ──────────────────────────────────────────────────────────────────
 function LoadingSkeleton() {
     return (
@@ -161,17 +166,20 @@ function ProblemEditorPage() {
                 const p = data.data || data;
                 setProblem(p);
                 document.title = p?.title ? `${p.title} | CodeShares` : 'CodeShares';
+                // Seed the editor with this problem's visible helper snippet for the language.
+                if (!collabMode) setCode(starterFor(p, language.label));
             })
             .catch(() => { toast.error('Problem not found'); navigate('/problems'); })
             .finally(() => setLoading(false));
         return () => { document.title = 'CodeShares'; };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [id, navigate]);
 
     // ── language switch ───────────────────────────────────────────────────────
     const handleLanguageChange = (lang) => {
         setLanguage(lang);
         // In a shared session the document is owned by Yjs — don't clobber it with a template.
-        if (!collabMode) setCode(TEMPLATES[lang.label] || '');
+        if (!collabMode) setCode(starterFor(problem, lang.label));
     };
 
     // ── Monaco mount ─────────────────────────────────────────────────────────

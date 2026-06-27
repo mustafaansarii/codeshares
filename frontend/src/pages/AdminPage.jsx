@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback } from 'react';
 import Editor from '@monaco-editor/react';
 import toast from 'react-hot-toast';
 import {
-    MdAdd, MdEdit, MdDelete, MdArrowBack, MdPlayArrow, MdCheckCircle, MdCancel, MdSave, MdClose,
+    MdAdd, MdEdit, MdDelete, MdArrowBack, MdPlayArrow, MdCheckCircle, MdCancel, MdSave, MdClose, MdUploadFile,
 } from 'react-icons/md';
 import Navbar from '../components/navbar/Navbar';
 import RichTextEditor from '../components/admin/RichTextEditor';
@@ -11,12 +11,69 @@ import { LANGUAGES, langByLabel } from '../lib/languages';
 
 const DIFFICULTIES = ['EASY', 'MEDIUM', 'HARD'];
 
-const SOLUTION_TEMPLATES = {
-    Java: `class Solution {\n    public String solve(String input) {\n        // parse input, return the answer as a String\n        return "";\n    }\n}`,
-    Python: `class Solution:\n    def solve(self, input: str) -> str:\n        # parse input, return the answer as a string\n        return ""`,
-    'C++': `class Solution {\npublic:\n    std::string solve(std::string input) {\n        return "";\n    }\n};`,
-    C: `char* solve(char* input) {\n    return "";\n}`,
-    'Node.js': `class Solution {\n    solve(input) {\n        return "";\n    }\n}`,
+// Full driver/helper programs: read stdin, call solve(input), print the result.
+// These are the *visible* starter snippets users edit; the reference solution is the same
+// shape with solve() implemented. Execution runs these raw (they contain main + I/O).
+const HELPER_TEMPLATES = {
+    Java: `import java.util.*;
+import java.io.*;
+
+public class Main {
+    // Implement this — parse 'input' and return the answer.
+    static String solve(String input) {
+        return "";
+    }
+
+    public static void main(String[] args) throws IOException {
+        String input = new String(System.in.readAllBytes()).trim();
+        System.out.print(solve(input));
+    }
+}`,
+    Python: `import sys
+
+def solve(input):
+    # Implement this — parse 'input' and return the answer (as a string).
+    return ""
+
+if __name__ == "__main__":
+    data = sys.stdin.read().strip()
+    sys.stdout.write(str(solve(data)))`,
+    'C++': `#include <bits/stdc++.h>
+using namespace std;
+
+// Implement this — parse 'input' and return the answer.
+string solve(string input) {
+    return "";
+}
+
+int main() {
+    string input((istreambuf_iterator<char>(cin)), istreambuf_iterator<char>());
+    while (!input.empty() && (input.back() == '\\n' || input.back() == ' ')) input.pop_back();
+    cout << solve(input);
+}`,
+    C: `#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+/* Implement this — parse 'input' and return the answer. */
+char* solve(char* input) {
+    return "";
+}
+
+int main() {
+    static char buf[1 << 20];
+    int n = fread(buf, 1, sizeof(buf) - 1, stdin);
+    while (n > 0 && (buf[n-1] == '\\n' || buf[n-1] == ' ')) n--;
+    buf[n] = '\\0';
+    printf("%s", solve(buf));
+}`,
+    'Node.js': `function solve(input) {
+    // Implement this — parse 'input' and return the answer.
+    return "";
+}
+
+const input = require('fs').readFileSync(0, 'utf8').trim();
+process.stdout.write(String(solve(input)));`,
 };
 
 const inputClass = 'w-full rounded-xl border border-line bg-paper px-3 py-2.5 text-sm text-ink outline-none focus:border-clay focus:ring-2 focus:ring-clay/20';
@@ -161,13 +218,15 @@ function ProblemEditor({ initial, onBack }) {
     const [form, setForm] = useState(() => ({
         ...emptyProblem,
         ...initial,
+        starterCode: initial.starter_code ?? {},
         testCases: (initial.test_cases ?? initial.testCases ?? emptyProblem.testCases).map((t) => ({
             input_data: t.input_data ?? '', expected_output: t.expected_output ?? '',
             is_sample: t.is_sample ?? false, weight: t.weight ?? 1,
         })),
     }));
+    const [starterLang, setStarterLang] = useState(LANGUAGES[0]);
     const [refLang, setRefLang] = useState(LANGUAGES[0]);
-    const [refCode, setRefCode] = useState(SOLUTION_TEMPLATES.Java);
+    const [refCode, setRefCode] = useState(initial.starter_code?.Java || HELPER_TEMPLATES.Java);
     const [testResult, setTestResult] = useState(null);
     const [testing, setTesting] = useState(false);
     const [saving, setSaving] = useState(false);
@@ -176,6 +235,36 @@ function ProblemEditor({ initial, onBack }) {
     const set = (patch) => setForm((f) => ({ ...f, ...patch }));
     const setTC = (i, patch) => { setValidated(false); setForm((f) => ({ ...f, testCases: f.testCases.map((t, j) => j === i ? { ...t, ...patch } : t) })); };
     const addTC = () => setForm((f) => ({ ...f, testCases: [...f.testCases, { input_data: '', expected_output: '', is_sample: false, weight: 1 }] }));
+
+    // Starter snippet shown to the user, edited per language.
+    const starterValue = form.starterCode[starterLang.label] ?? HELPER_TEMPLATES[starterLang.label] ?? '';
+    const setStarter = (code) => setForm((f) => ({ ...f, starterCode: { ...f.starterCode, [starterLang.label]: code } }));
+    const pickStarterLang = (l) => {
+        setStarterLang(l);
+        setForm((f) => f.starterCode[l.label] != null ? f : { ...f, starterCode: { ...f.starterCode, [l.label]: HELPER_TEMPLATES[l.label] || '' } });
+    };
+
+    // Parse uploaded .txt test-case files: each file is "<input>\n===\n<expected>".
+    const onUploadTests = async (files) => {
+        const parsed = [];
+        for (const file of files) {
+            const text = await file.text();
+            const idx = text.search(/^\s*===\s*$/m);
+            if (idx >= 0) {
+                const sep = text.match(/^\s*===\s*$/m);
+                const input = text.slice(0, idx).replace(/\n$/, '');
+                const expected = text.slice(idx + sep[0].length).replace(/^\n/, '');
+                parsed.push({ input_data: input, expected_output: expected, is_sample: false, weight: 1 });
+            } else {
+                parsed.push({ input_data: text, expected_output: '', is_sample: false, weight: 1 });
+            }
+        }
+        if (parsed.length) {
+            setValidated(false);
+            setForm((f) => ({ ...f, testCases: [...f.testCases, ...parsed] }));
+            toast.success(`Added ${parsed.length} test case${parsed.length > 1 ? 's' : ''}`);
+        }
+    };
     const removeTC = (i) => setForm((f) => ({ ...f, testCases: f.testCases.filter((_, j) => j !== i) }));
 
     const runTest = async () => {
@@ -204,6 +293,7 @@ function ProblemEditor({ initial, onBack }) {
             title: form.title, difficulty: form.difficulty, description: form.description,
             constraints: form.constraints, time_limit: Number(form.time_limit) || 5000,
             memory_limit: Number(form.memory_limit) || 256, sheet_name: form.sheet_name,
+            starter_code: form.starterCode,
             testCases: form.testCases.map((t) => ({
                 input_data: t.input_data, expected_output: t.expected_output,
                 is_sample: !!t.is_sample, weight: Number(t.weight) || 1,
@@ -281,13 +371,42 @@ function ProblemEditor({ initial, onBack }) {
                     </div>
                 </div>
 
-                {/* ── Right: test cases + reference solution ── */}
+                {/* ── Right: starter snippet + test cases + reference solution ── */}
                 <div className="space-y-5">
                     <div>
                         <div className="mb-2 flex items-center justify-between">
-                            <label className={labelClass + ' mb-0'}>Test cases</label>
-                            <button onClick={addTC} className="flex items-center gap-1 text-xs font-semibold text-clay hover:text-clay-strong"><MdAdd className="h-3.5 w-3.5" /> Add</button>
+                            <label className={labelClass + ' mb-0'}>Starter code <span className="text-ink-muted/70">(shown to users)</span></label>
+                            <select value={starterLang.label} onChange={(e) => pickStarterLang(langByLabel(e.target.value))}
+                                className="rounded-md border border-line bg-paper px-2 py-1 text-xs text-ink outline-none">
+                                {LANGUAGES.map((l) => <option key={l.label} value={l.label}>{l.label}</option>)}
+                            </select>
                         </div>
+                        <div className="overflow-hidden rounded-xl border border-line">
+                            <Editor
+                                height="200px"
+                                language={starterLang.monaco}
+                                value={starterValue}
+                                onChange={(v) => setStarter(v ?? '')}
+                                theme="vs-dark"
+                                options={{ fontSize: 13, minimap: { enabled: false }, scrollBeyondLastLine: false, padding: { top: 10 } }}
+                            />
+                        </div>
+                        <p className="mt-1.5 text-xs text-ink-muted">The visible helper that reads input and calls the user's function. Set one per language.</p>
+                    </div>
+
+                    <div>
+                        <div className="mb-2 flex items-center justify-between">
+                            <label className={labelClass + ' mb-0'}>Test cases</label>
+                            <div className="flex items-center gap-3">
+                                <label className="flex cursor-pointer items-center gap-1 text-xs font-semibold text-ink-soft hover:text-ink">
+                                    <MdUploadFile className="h-3.5 w-3.5" /> Upload .txt
+                                    <input type="file" accept=".txt" multiple className="hidden"
+                                        onChange={(e) => { onUploadTests([...e.target.files]); e.target.value = ''; }} />
+                                </label>
+                                <button onClick={addTC} className="flex items-center gap-1 text-xs font-semibold text-clay hover:text-clay-strong"><MdAdd className="h-3.5 w-3.5" /> Add</button>
+                            </div>
+                        </div>
+                        <p className="mb-2 text-xs text-ink-muted">Upload format: one file per case — input, then a line <code className="rounded bg-cream px-1">===</code>, then expected output.</p>
                         <div className="space-y-3">
                             {form.testCases.map((t, i) => (
                                 <div key={i} className="rounded-xl border border-line bg-paper p-3">
@@ -324,7 +443,7 @@ function ProblemEditor({ initial, onBack }) {
                     <div>
                         <div className="mb-2 flex items-center justify-between">
                             <label className={labelClass + ' mb-0'}>Reference solution <span className="text-ink-muted/70">(must pass to save)</span></label>
-                            <select value={refLang.label} onChange={(e) => { const l = langByLabel(e.target.value); setRefLang(l); setRefCode(SOLUTION_TEMPLATES[l.label]); setValidated(false); }}
+                            <select value={refLang.label} onChange={(e) => { const l = langByLabel(e.target.value); setRefLang(l); setRefCode(form.starterCode[l.label] || HELPER_TEMPLATES[l.label]); setValidated(false); }}
                                 className="rounded-md border border-line bg-paper px-2 py-1 text-xs text-ink outline-none">
                                 {LANGUAGES.map((l) => <option key={l.label} value={l.label}>{l.label}</option>)}
                             </select>
