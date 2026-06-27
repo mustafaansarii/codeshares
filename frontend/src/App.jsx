@@ -10,14 +10,16 @@ import ProblemsPage from './pages/ProblemsPage';
 import ProblemEditorPage from './pages/ProblemEditorPage';
 import MyFilesPage from './pages/MyFilesPage';
 import FileEditorPage from './pages/FileEditorPage';
+import AdminPage from './pages/AdminPage';
 import PrivateRoute from './components/route-manage/PrivateRoute';
+import AdminRoute from './components/route-manage/AdminRoute';
 import Footer from './components/footer/Footer';
 import NotFound from './components/not-found/NotFound';
 import authService from './services/auth.service';
 
 function App() {
   const location = useLocation();
-  const noFooterPaths = ['/login', '/profile', '/problems', '/files'];
+  const noFooterPaths = ['/login', '/profile', '/problems', '/files', '/admin'];
   const isEditorPage = /^\/problems\/\d+/.test(location.pathname) || /^\/files\/.+/.test(location.pathname);
   const hideFooter = noFooterPaths.includes(location.pathname) || isEditorPage;
 
@@ -76,6 +78,14 @@ function App() {
             <PrivateRoute>
               <FileEditorPage />
             </PrivateRoute>
+          }
+        />
+        <Route
+          path="/admin"
+          element={
+            <AdminRoute>
+              <AdminPage />
+            </AdminRoute>
           }
         />
         <Route

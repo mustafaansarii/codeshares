@@ -365,7 +365,10 @@ function ProblemEditorPage() {
                                     }`}>{problem?.difficulty}</span>
                                 </div>
 
-                                <p className="text-slate-300 leading-relaxed">{problem?.description}</p>
+                                <div
+                                    className="prose-cs prose-invert-cs text-slate-300"
+                                    dangerouslySetInnerHTML={{ __html: problem?.description || '' }}
+                                />
 
                                 {problem?.constraints && (
                                     <div>

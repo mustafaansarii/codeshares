@@ -36,6 +36,7 @@ class AuthService {
             return response.data;
         } finally {
             localStorage.removeItem('isAuthenticated');
+            localStorage.removeItem('roles');
         }
     }
 
@@ -48,6 +49,18 @@ class AuthService {
         return localStorage.getItem('isAuthenticated') === 'true';
     }
 
+    roles() {
+        try {
+            return JSON.parse(localStorage.getItem('roles') || '[]');
+        } catch {
+            return [];
+        }
+    }
+
+    isAdmin() {
+        return this.roles().includes('ADMIN');
+    }
+
     loginWithProvider(provider) {
         window.location.href = `/codeshare/oauth2/authorization/${provider}`;
     }
@@ -57,10 +70,13 @@ class AuthService {
             const response = await silentAxios.get('me');
             if (response.status === 200) {
                 localStorage.setItem('isAuthenticated', 'true');
+                const roles = response.data?.roles ?? response.data?.data?.roles ?? [];
+                localStorage.setItem('roles', JSON.stringify(roles));
             }
         } catch (error) {
             if (error.response?.status === 401 || error.response?.status === 403) {
                 localStorage.removeItem('isAuthenticated');
+                localStorage.removeItem('roles');
             }
         }
     }

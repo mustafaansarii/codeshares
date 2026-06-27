@@ -5,6 +5,8 @@ import com.codeshare.dto.PaginatedResponse;
 import com.codeshare.dto.ProblemFilterRequestDto;
 import com.codeshare.dto.ProblemRequestDto;
 import com.codeshare.dto.ProblemResponseDto;
+import com.codeshare.dto.ValidateRequest;
+import com.codeshare.dto.ValidateResponseDto;
 import com.codeshare.service.ProblemService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +35,12 @@ public class ProblemController {
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 ApiResponse.created(response, "Problem created successfully")
         );
+    }
+
+    /** Admin pre-save check — runs a reference solution against the candidate test cases. */
+    @PostMapping("/validate")
+    public ResponseEntity<ApiResponse<ValidateResponseDto>> validate(@Valid @RequestBody ValidateRequest request) {
+        return ResponseEntity.ok(ApiResponse.success(problemService.validateSolution(request)));
     }
 
     @GetMapping("/{id}")

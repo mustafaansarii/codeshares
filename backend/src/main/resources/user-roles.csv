@@ -3,6 +3,7 @@ GET,/api/auth/me,USER|ADMIN
 PATCH,/api/auth/profile,USER|ADMIN
 GET,/api/problems,PUBLIC
 GET,/api/problems/**,PUBLIC
+POST,/api/problems/validate,ADMIN
 POST,/api/problems,ADMIN
 PUT,/api/problems/**,ADMIN
 DELETE,/api/problems/**,ADMIN

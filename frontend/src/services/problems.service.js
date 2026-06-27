@@ -51,6 +51,16 @@ class ProblemsService {
         });
         return response.data;
     }
+
+    /** Admin: dry-run a reference solution against candidate test cases (no save). */
+    async validate({ code, language, testCases }) {
+        const response = await axiosInstance.post('validate', {
+            code,
+            language,
+            test_cases: testCases,
+        });
+        return response.data.data ?? response.data;
+    }
 }
 
 export default new ProblemsService();

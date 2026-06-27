@@ -133,7 +133,7 @@ public class UserSolutionService {
         TestCaseExecution execution = new TestCaseExecution();
         execution.setSolution(solution);
         execution.setTestCase(testCase);
-        execution.setStatus(getExecutionStatus(result));
+        execution.setStatus(getExecutionStatus(result, testCase.getExpectedOutput()));
         execution.setActualOutput(result.stdout());
         execution.setExpectedOutput(testCase.getExpectedOutput());
         execution.setErrorMessage(result.stderr());
@@ -142,14 +142,32 @@ public class UserSolutionService {
         return executionRepository.save(execution);
     }
 
-    private String getExecutionStatus(ExecutionResult result) {
+    private String getExecutionStatus(ExecutionResult result, String expectedOutput) {
         if (result.timedOut()) {
             return "TIMEOUT";
         }
         if (result.exitCode() != 0) {
             return "RUNTIME_ERROR";
         }
-        return "PASSED";
+        // A run only PASSES when its output actually matches the expected output.
+        return outputsMatch(result.stdout(), expectedOutput) ? "PASSED" : "WRONG_ANSWER";
+    }
+
+    /** Lenient comparison: ignores trailing whitespace on each line and surrounding blank lines. */
+    static boolean outputsMatch(String actual, String expected) {
+        return normalizeOutput(actual).equals(normalizeOutput(expected));
+    }
+
+    private static String normalizeOutput(String value) {
+        if (value == null) {
+            return "";
+        }
+        String[] lines = value.replace("\r\n", "\n").split("\n", -1);
+        StringBuilder sb = new StringBuilder();
+        for (String line : lines) {
+            sb.append(line.stripTrailing()).append('\n');
+        }
+        return sb.toString().strip();
     }
 
     private void updateSolutionStats(UserSolution solution, int totalTests, int passedTests, int totalTime) {

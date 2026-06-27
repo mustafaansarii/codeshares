@@ -1,10 +1,15 @@
 package com.codeshare.service;
 
+import com.codeshare.dto.CodeRunRequestForm;
+import com.codeshare.dto.ExecutionResult;
 import com.codeshare.dto.ProblemRequestDto;
 import com.codeshare.dto.ProblemResponseDto;
 import com.codeshare.dto.PaginatedResponse;
 import com.codeshare.dto.ProblemFilterRequestDto;
 import com.codeshare.dto.TestCaseDto;
+import com.codeshare.dto.TestCaseResultDto;
+import com.codeshare.dto.ValidateRequest;
+import com.codeshare.dto.ValidateResponseDto;
 import com.codeshare.entity.Problem;
 import com.codeshare.entity.TestCase;
 import com.codeshare.repository.ProblemRepository;
@@ -17,6 +22,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,6 +32,53 @@ public class ProblemService {
 
     private final ProblemRepository problemRepository;
     private final TestCaseRepository testCaseRepository;
+    private final CodeExecutionService codeExecutionService;
+
+    public ValidateResponseDto validateSolution(ValidateRequest request) {
+        List<TestCaseResultDto> results = new ArrayList<>();
+        int passed = 0;
+
+        for (TestCaseDto tc : request.getTestCases()) {
+            CodeRunRequestForm form = CodeRunRequestForm.builder()
+                    .code(request.getCode())
+                    .language(request.getLanguage())
+                    .input(tc.getInputData())
+                    .timeLimit(15000)
+                    .build();
+
+            ExecutionResult result =
+                    codeExecutionService.executeForComparison(form, tc.getExpectedOutput());
+
+            String status;
+            if (result.timedOut()) {
+                status = "TIMEOUT";
+            } else if (result.exitCode() != 0) {
+                status = "RUNTIME_ERROR";
+            } else {
+                status = UserSolutionService.outputsMatch(result.stdout(), tc.getExpectedOutput())
+                        ? "PASSED" : "WRONG_ANSWER";
+            }
+            if ("PASSED".equals(status)) {
+                passed++;
+            }
+
+            results.add(TestCaseResultDto.builder()
+                    .status(status)
+                    .expectedOutput(tc.getExpectedOutput())
+                    .actualOutput(result.stdout())
+                    .errorMessage(result.stderr())
+                    .executionTimeMs(result.durationMs())
+                    .build());
+        }
+
+        int total = request.getTestCases().size();
+        return ValidateResponseDto.builder()
+                .passedTestCases(passed)
+                .totalTestCases(total)
+                .allPassed(passed == total && total > 0)
+                .testResults(results)
+                .build();
+    }
 
     @Transactional
     public ProblemResponseDto createProblem(ProblemRequestDto requestDto) {
@@ -83,7 +136,7 @@ public class ProblemService {
         problemRepository.delete(problem);
     }
 
-// Helper methods
+
 
     private Problem getProblemOrThrow(Long problemId) {
         return problemRepository.findById(problemId)

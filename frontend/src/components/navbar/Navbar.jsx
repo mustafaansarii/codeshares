@@ -9,6 +9,7 @@ const navItems = [
     { label: 'Home', to: '/' },
     { label: 'Problems', to: '/problems' },
     { label: 'Files', to: '/files', authRequired: true },
+    { label: 'Admin', to: '/admin', adminRequired: true },
 ];
 
 const linkClass = ({ isActive }) =>
@@ -68,10 +69,14 @@ function ProfileMenu({ onLogout }) {
 export default function Navbar() {
     const [mobileOpen, setMobileOpen] = useState(false);
     const [isAuthenticated, setIsAuthenticated] = useState(authService.isAuthenticated());
+    const [isAdmin, setIsAdmin] = useState(authService.isAdmin());
     const navigate = useNavigate();
 
     useEffect(() => {
-        authService.verifyAuth().then(() => setIsAuthenticated(authService.isAuthenticated()));
+        authService.verifyAuth().then(() => {
+            setIsAuthenticated(authService.isAuthenticated());
+            setIsAdmin(authService.isAdmin());
+        });
     }, []);
 
     const closeMobile = () => setMobileOpen(false);
@@ -87,7 +92,8 @@ export default function Navbar() {
         }
     };
 
-    const visibleNavItems = navItems.filter((item) => !item.authRequired || isAuthenticated);
+    const visibleNavItems = navItems.filter((item) =>
+        (!item.authRequired || isAuthenticated) && (!item.adminRequired || isAdmin));
 
     return (
         <header className="sticky top-0 z-50 border-b border-line bg-canvas/85 backdrop-blur-xl">
