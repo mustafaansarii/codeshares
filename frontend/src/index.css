@@ -1,10 +1,52 @@
 @import "tailwindcss";
 
-@custom-variant dark (&:where(.dark, .dark *));
+
+@custom-variant dark (@media (prefers-color-scheme: dark));
 
 @theme {
-  --font-sans: "Inter", "Plus Jakarta Sans", "Satoshi", "Geist", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Inter", "Plus Jakarta Sans", "Satoshi", "Geist", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Fraunces", "Tiempos", Georgia, ui-serif, serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+
+  /* canvas + surfaces */
+  --color-canvas: #faf9f5;
+  --color-cream: #f0eee6;
+  --color-paper: #ffffff;
+
+  /* ink */
+  --color-ink: #1f1e1d;
+  --color-ink-soft: #4a4843;
+  --color-ink-muted: #73706a;
+
+  /* warm borders */
+  --color-line: #e6e2d8;
+  --color-line-strong: #d9d4c7;
+
+  /* clay accent */
+  --color-clay: #d97757;
+  --color-clay-strong: #c15f3c;
+  --color-clay-soft: #f3e6df;
+}
+
+/* Dark mode — warm near-black surfaces, brighter clay. Overrides the token
+   values, so every bg-canvas/text-ink/border-line utility flips automatically. */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-canvas: #1c1b19;
+    --color-cream: #262420;
+    --color-paper: #2a2824;
+
+    --color-ink: #f5f3ec;
+    --color-ink-soft: #cbc6bb;
+    --color-ink-muted: #938e83;
+
+    --color-line: #3a382f;
+    --color-line-strong: #4a473d;
+
+    --color-clay: #e08a6b;
+    --color-clay-strong: #ec9a7d;
+    --color-clay-soft: #3a2a22;
+  }
 }
 
 html,
@@ -13,73 +55,31 @@ body {
   padding: 0;
   height: 100%;
   min-height: 100vh;
-  font-size: 17px;
+  font-size: 16.5px;
   font-family: var(--font-sans);
-  color: #0f172a;
-  color-scheme: light;
+  color: var(--color-ink);
+  color-scheme: light dark;
 }
 
 body {
   position: relative;
-  background-color: #f7faff;
-  background-image: linear-gradient(135deg, #f8fbff 0%, #f3f6ff 100%);
+  background-color: var(--color-canvas);
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-body::before,
-body::after {
-  content: "";
-  position: fixed;
-  inset: -25%;
-  z-index: -1;
-  pointer-events: none;
-  background-repeat: no-repeat;
-  filter: blur(75px);
-  will-change: transform;
-}
-
-body::before {
-  background-image:
-    radial-gradient(38% 38% at 16% 26%, rgba(56, 189, 248, 0.70), transparent 72%),
-    radial-gradient(42% 42% at 84% 20%, rgba(167, 139, 250, 0.66), transparent 72%),
-    radial-gradient(48% 48% at 64% 84%, rgba(52, 211, 153, 0.64), transparent 72%);
-  animation: aurora-a 20s ease-in-out infinite alternate;
-}
-
-body::after {
-  background-image:
-    radial-gradient(40% 40% at 78% 62%, rgba(244, 114, 182, 0.60), transparent 72%),
-    radial-gradient(36% 36% at 26% 76%, rgba(45, 212, 191, 0.58), transparent 72%),
-    radial-gradient(42% 42% at 46% 10%, rgba(129, 140, 248, 0.56), transparent 72%);
-  animation: aurora-b 26s ease-in-out infinite alternate;
-}
-
-@keyframes aurora-a {
-  0%   { transform: translate3d(-4%, -2%, 0) scale(1.05) rotate(0deg); }
-  50%  { transform: translate3d(3%, 5%, 0)  scale(1.15) rotate(8deg); }
-  100% { transform: translate3d(-2%, 3%, 0) scale(1.06) rotate(-7deg); }
-}
-
-@keyframes aurora-b {
-  0%   { transform: translate3d(3%, 2%, 0)  scale(1.08) rotate(0deg); }
-  50%  { transform: translate3d(-5%, -4%, 0) scale(1.0) rotate(-10deg); }
-  100% { transform: translate3d(2%, -3%, 0) scale(1.12) rotate(6deg); }
-}
-
-@media print {
-  body::before,
-  body::after { display: none !important; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  body::before,
-  body::after { animation: none; }
-}
-
+/* Editorial serif headings — the signature Claude/Anthropic look */
 .font-display {
   font-family: var(--font-display);
+  font-optical-sizing: auto;
+  letter-spacing: -0.01em;
+}
+
+h1, h2, h3 {
+  font-family: var(--font-display);
+  font-optical-sizing: auto;
+  letter-spacing: -0.01em;
 }
 
 @keyframes ticker-scroll {
@@ -103,14 +103,12 @@ body::after {
 }
 
 .editor-header-bg {
-  background-color: #ffffff;
+  background-color: #faf9f5;
   background-image: linear-gradient(
     90deg,
-    rgba(56, 189, 248, 0.22) 0%,
-    rgba(129, 140, 248, 0.22) 28%,
-    rgba(167, 139, 250, 0.20) 52%,
-    rgba(244, 114, 182, 0.18) 74%,
-    rgba(52, 211, 153, 0.22) 100%
+    rgba(217, 119, 87, 0.14) 0%,
+    rgba(217, 119, 87, 0.06) 45%,
+    rgba(240, 238, 230, 0.4) 100%
   );
 }
 
@@ -157,22 +155,22 @@ body::after {
 }
 
 .card-light {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.07), 0 1px 2px -1px rgba(0, 0, 0, 0.07);
+  background: var(--color-paper);
+  border: 1px solid var(--color-line);
+  box-shadow: 0 1px 3px 0 rgba(31, 30, 29, 0.05), 0 1px 2px -1px rgba(31, 30, 29, 0.05);
 }
 
 .form-card {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
+  background: var(--color-paper);
+  border: 1px solid var(--color-line);
   box-shadow:
-    0 4px 6px -1px rgba(0, 0, 0, 0.07),
-    0 2px 4px -2px rgba(0, 0, 0, 0.07);
+    0 4px 6px -1px rgba(31, 30, 29, 0.06),
+    0 2px 4px -2px rgba(31, 30, 29, 0.06);
 }
 
 /* ── Collaborative remote cursors (y-monaco) ──────────────────────────────── */
 .yRemoteSelection {
-  background-color: rgba(250, 129, 0, 0.35);
+  background-color: rgba(217, 119, 87, 0.35);
 }
 .yRemoteSelectionHead {
   position: absolute;

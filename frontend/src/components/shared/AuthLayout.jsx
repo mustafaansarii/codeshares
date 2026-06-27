@@ -5,74 +5,60 @@ export default function AuthLayout({ badge, title, description, features = [], b
     const navigate = useNavigate();
 
     return (
-        <div className="flex min-h-screen w-full">
+        <div className="flex min-h-screen w-full bg-canvas">
 
-            <div className="hidden lg:flex flex-col w-1/2 text-white relative overflow-hidden bg-gradient-to-br from-slate-900 to-slate-800">
-
-                <div className="absolute inset-0 bg-gradient-to-br from-black/75 via-black/55 to-black/30 pointer-events-none hidden dark:block" />
-
-                <span className="absolute -bottom-4 -left-2 text-[10rem] font-black tracking-tighter text-white/[0.04] select-none leading-none pointer-events-none">
-                    AUTH
+            {/* ── Left brand panel ── */}
+            <div className="relative hidden w-1/2 flex-col overflow-hidden bg-cream lg:flex">
+                <div className="pointer-events-none absolute -top-24 left-1/4 h-80 w-80 rounded-full bg-clay/10 blur-3xl" />
+                <span className="pointer-events-none absolute -bottom-6 -left-2 select-none font-display text-[10rem] font-semibold leading-none tracking-tighter text-ink/[0.04]">
+                    {'</>'}
                 </span>
 
-                <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-72 h-72 rounded-full bg-teal-500/10 blur-3xl pointer-events-none" />
-
-                <header className="relative z-10 border-b border-white/10 shrink-0">
-                    <div className="flex h-14 items-center px-10">
-                        <button
-                            onClick={() => navigate('/')}
-                            className="group flex items-center gap-3 outline-none"
-                        >
-                            <BrandLogo height={34} className="drop-shadow-[0_0_10px_rgba(45,212,191,0.45)]" />
+                <header className="relative z-10 shrink-0 border-b border-line">
+                    <div className="flex h-16 items-center px-10">
+                        <button onClick={() => navigate('/')} className="flex items-center text-ink outline-none">
+                            <BrandLogo size={34} />
                         </button>
                     </div>
                 </header>
 
-                <div className="relative z-10 flex flex-col gap-6 px-10 pt-8 pb-12">
-
+                <div className="relative z-10 flex flex-col gap-6 px-10 pb-12 pt-10">
                     {breadcrumb && (
-                        <div className="flex items-center gap-2 text-[11px] font-semibold tracking-[0.18em] uppercase pl-2">
-                            <button
-                                onClick={() => navigate('/')}
-                                className="text-white/30 hover:text-white/60 transition-colors"
-                            >
-                                Home
-                            </button>
-                            <span className="text-white/20">/</span>
-                            <span className="text-teal-400/80">{breadcrumb}</span>
+                        <div className="flex items-center gap-2 pl-1 text-[11px] font-semibold uppercase tracking-[0.18em]">
+                            <button onClick={() => navigate('/')} className="text-ink-muted transition-colors hover:text-ink">Home</button>
+                            <span className="text-ink-muted/50">/</span>
+                            <span className="text-clay">{breadcrumb}</span>
                         </div>
                     )}
 
                     {badge && (
-                        <div className="inline-flex w-fit items-center gap-2 rounded-full border border-teal-400/25 bg-teal-500/10 px-3.5 py-1 text-xs font-semibold text-teal-300 backdrop-blur-sm">
+                        <div className="inline-flex w-fit items-center gap-2 rounded-full border border-clay/25 bg-clay-soft px-3.5 py-1 text-xs font-semibold text-clay-strong">
                             <span className="relative flex h-1.5 w-1.5">
-                                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-teal-400 opacity-50" />
-                                <span className="inline-flex h-1.5 w-1.5 rounded-full bg-teal-400" />
+                                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-clay opacity-50" />
+                                <span className="inline-flex h-1.5 w-1.5 rounded-full bg-clay" />
                             </span>
                             {badge}
                         </div>
                     )}
 
                     {title && (
-                        <h1 className="text-4xl font-extrabold leading-[1.15] tracking-tight text-white drop-shadow-sm xl:text-5xl">
+                        <h1 className="font-display text-4xl font-semibold leading-[1.12] tracking-tight text-ink xl:text-5xl">
                             {title}
                         </h1>
                     )}
 
-                    <div className="w-10 h-0.5 rounded-full bg-teal-400/60" />
+                    <div className="h-0.5 w-10 rounded-full bg-clay/60" />
 
                     {description && (
-                        <p className="max-w-sm text-[0.84rem] leading-relaxed text-white/50">
-                            {description}
-                        </p>
+                        <p className="max-w-sm text-sm leading-relaxed text-ink-soft">{description}</p>
                     )}
 
                     {features.length > 0 && (
                         <ul className="space-y-3 pt-1">
                             {features.map((feat, i) => (
-                                <li key={i} className="flex items-start gap-3 text-sm text-white/60">
-                                    <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-teal-500/15 ring-1 ring-teal-400/20">
-                                        <svg viewBox="0 0 20 20" fill="currentColor" className="h-3 w-3 text-teal-400">
+                                <li key={i} className="flex items-start gap-3 text-sm text-ink-soft">
+                                    <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-clay-soft ring-1 ring-clay/20">
+                                        <svg viewBox="0 0 20 20" fill="currentColor" className="h-3 w-3 text-clay">
                                             <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                                         </svg>
                                     </span>
@@ -84,26 +70,20 @@ export default function AuthLayout({ badge, title, description, features = [], b
                 </div>
             </div>
 
-            <div className="hidden lg:block w-px bg-black/50 dark:bg-white shrink-0" />
+            <div className="hidden w-px shrink-0 bg-line lg:block" />
 
+            {/* ── Right form panel ── */}
             <div className="flex flex-1 flex-col">
-
-                <header className="lg:hidden border-b border-slate-400 shrink-0 bg-slate-50">
-                    <div className="flex h-14 items-center justify-between px-4">
-                        <button onClick={() => navigate('/')} className="group flex items-center outline-none">
-                            <BrandLogo height={32} />
+                <header className="shrink-0 border-b border-line bg-canvas lg:hidden">
+                    <div className="flex h-16 items-center justify-between px-4">
+                        <button onClick={() => navigate('/')} className="flex items-center text-ink outline-none">
+                            <BrandLogo size={30} />
                         </button>
-
                         {breadcrumb && (
-                            <div className="flex items-center gap-1.5 text-[10px] font-semibold tracking-widest uppercase">
-                                <button
-                                    onClick={() => navigate('/')}
-                                    className="text-black/60 hover:text-black transition-colors"
-                                >
-                                    Home
-                                </button>
-                                <span className="text-black/30">/</span>
-                                <span className="text-teal-600">{breadcrumb}</span>
+                            <div className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-widest">
+                                <button onClick={() => navigate('/')} className="text-ink-muted transition-colors hover:text-ink">Home</button>
+                                <span className="text-ink-muted/50">/</span>
+                                <span className="text-clay">{breadcrumb}</span>
                             </div>
                         )}
                     </div>

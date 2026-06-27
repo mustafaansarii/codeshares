@@ -1,17 +1,17 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
-  <!-- Background rounded square (brand dark) -->
-  <rect width="64" height="64" rx="14" fill="#0f172a"/>
+  <!-- Background rounded square (brand cream) -->
+  <rect width="64" height="64" rx="14" fill="#f0eee6"/>
 
   <!-- Brand code-mark -->
   <path
     d="M40 18H28C22 18 18 22 18 28V36C18 42 22 46 28 46H40"
-    stroke="#2563EB"
+    stroke="#D97757"
     stroke-width="4"
     stroke-linecap="round"
   />
   <path
     d="M46 24L34 32L46 40"
-    stroke="#2563EB"
+    stroke="#D97757"
     stroke-width="4"
     stroke-linecap="round"
     stroke-linejoin="round"

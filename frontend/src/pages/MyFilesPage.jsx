@@ -8,7 +8,7 @@ import Navbar from '../components/navbar/Navbar';
 import filesService from '../services/files.service';
 import { LANGUAGES } from '../lib/languages';
 
-const LANG_BADGE = 'bg-slate-100 text-slate-600 ring-1 ring-slate-200';
+const LANG_BADGE = 'bg-cream text-ink-soft ring-1 ring-line';
 
 export default function MyFilesPage() {
     const navigate = useNavigate();
@@ -50,17 +50,17 @@ export default function MyFilesPage() {
     };
 
     return (
-        <div className="min-h-screen bg-slate-50">
+        <div className="min-h-screen bg-canvas">
             <Navbar />
             <main className="mx-auto max-w-5xl px-4 py-10 sm:px-6 lg:px-8">
                 <div className="mb-8 flex items-end justify-between">
                     <div>
-                        <h1 className="text-3xl font-bold text-slate-900">My Files</h1>
-                        <p className="mt-1 text-sm text-slate-500">Create, run, share and collaborate on code files.</p>
+                        <h1 className="text-3xl font-bold text-ink">My Files</h1>
+                        <p className="mt-1 text-sm text-ink-muted">Create, run, share and collaborate on code files.</p>
                     </div>
                     <button
                         onClick={() => setCreateOpen(true)}
-                        className="flex items-center gap-1.5 rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800"
+                        className="flex items-center gap-1.5 rounded-xl bg-clay px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-clay-strong"
                     >
                         <MdAdd className="h-4 w-4" /> New file
                     </button>
@@ -126,10 +126,10 @@ export default function MyFilesPage() {
 function Section({ title, icon, children }) {
     return (
         <section className="mb-8">
-            <h2 className="mb-3 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-slate-400">
+            <h2 className="mb-3 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-ink-muted">
                 {icon} {title}
             </h2>
-            <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm divide-y divide-slate-100">
+            <div className="overflow-hidden rounded-2xl border border-line bg-paper shadow-sm divide-y divide-line">
                 {children}
             </div>
         </section>
@@ -138,18 +138,18 @@ function Section({ title, icon, children }) {
 
 function FileRow({ file, owner, onOpen, onRename, onDelete, onToggleVisibility }) {
     return (
-        <div className="group flex items-center gap-4 px-5 py-4 transition-colors hover:bg-teal-50/40">
+        <div className="group flex items-center gap-4 px-5 py-4 transition-colors hover:bg-clay-soft/40">
             <button onClick={onOpen} className="flex flex-1 items-center gap-3 text-left">
-                <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100 text-slate-500">
+                <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-cream text-ink-muted">
                     <MdInsertDriveFile className="h-5 w-5" />
                 </span>
                 <span className="min-w-0">
-                    <span className="block truncate font-semibold text-slate-800 group-hover:text-teal-700">{file.name}</span>
-                    <span className="mt-0.5 flex items-center gap-2 text-xs text-slate-400">
+                    <span className="block truncate font-semibold text-ink group-hover:text-clay-strong">{file.name}</span>
+                    <span className="mt-0.5 flex items-center gap-2 text-xs text-ink-muted">
                         <span className={`rounded-full px-2 py-0.5 font-medium ${LANG_BADGE}`}>{file.language}</span>
                         {file.visibility === 'PUBLIC'
                             ? <span className="inline-flex items-center gap-1 text-emerald-600"><MdPublic className="h-3.5 w-3.5" /> Public</span>
-                            : <span className="inline-flex items-center gap-1 text-slate-400"><MdLock className="h-3.5 w-3.5" /> Private</span>}
+                            : <span className="inline-flex items-center gap-1 text-ink-muted"><MdLock className="h-3.5 w-3.5" /> Private</span>}
                         {!owner && <span className="rounded-full bg-indigo-50 px-2 py-0.5 font-medium text-indigo-600">{file.access}</span>}
                     </span>
                 </span>
@@ -174,7 +174,7 @@ function IconBtn({ children, title, danger, onClick }) {
             title={title}
             onClick={onClick}
             className={`flex h-8 w-8 items-center justify-center rounded-lg transition ${
-                danger ? 'text-slate-400 hover:bg-red-50 hover:text-red-500' : 'text-slate-400 hover:bg-slate-100 hover:text-slate-700'
+                danger ? 'text-ink-muted hover:bg-red-50 hover:text-red-500' : 'text-ink-muted hover:bg-cream hover:text-ink-soft'
             }`}
         >
             {children}
@@ -184,10 +184,10 @@ function IconBtn({ children, title, danger, onClick }) {
 
 function EmptyState({ onCreate }) {
     return (
-        <div className="flex flex-col items-center justify-center gap-2 py-16 text-slate-400">
+        <div className="flex flex-col items-center justify-center gap-2 py-16 text-ink-muted">
             <MdInsertDriveFile className="h-10 w-10 opacity-30" />
             <p className="text-sm font-medium">No files yet</p>
-            <button onClick={onCreate} className="mt-1 text-sm font-semibold text-teal-600 hover:text-teal-700">
+            <button onClick={onCreate} className="mt-1 text-sm font-semibold text-clay hover:text-clay-strong">
                 Create your first file
             </button>
         </div>
@@ -196,13 +196,13 @@ function EmptyState({ onCreate }) {
 
 function SkeletonList() {
     return (
-        <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white divide-y divide-slate-100">
+        <div className="overflow-hidden rounded-2xl border border-line bg-paper divide-y divide-line">
             {[...Array(4)].map((_, i) => (
                 <div key={i} className="flex items-center gap-3 px-5 py-4">
-                    <div className="h-9 w-9 rounded-lg bg-slate-100 animate-pulse" />
+                    <div className="h-9 w-9 rounded-lg bg-cream animate-pulse" />
                     <div className="space-y-2">
-                        <div className="h-4 w-48 rounded bg-slate-200 animate-pulse" />
-                        <div className="h-3 w-24 rounded bg-slate-100 animate-pulse" />
+                        <div className="h-4 w-48 rounded bg-line animate-pulse" />
+                        <div className="h-3 w-24 rounded bg-cream animate-pulse" />
                     </div>
                 </div>
             ))}
@@ -214,10 +214,10 @@ function SkeletonList() {
 function ModalShell({ title, onClose, children }) {
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={onClose}>
-            <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl" onClick={(e) => e.stopPropagation()}>
+            <div className="w-full max-w-md rounded-2xl bg-paper p-6 shadow-xl" onClick={(e) => e.stopPropagation()}>
                 <div className="mb-5 flex items-center justify-between">
-                    <h3 className="text-lg font-bold text-slate-900">{title}</h3>
-                    <button onClick={onClose} className="text-slate-400 hover:text-slate-700"><MdClose className="h-5 w-5" /></button>
+                    <h3 className="text-lg font-bold text-ink">{title}</h3>
+                    <button onClick={onClose} className="text-ink-muted hover:text-ink-soft"><MdClose className="h-5 w-5" /></button>
                 </div>
                 {children}
             </div>
@@ -225,7 +225,7 @@ function ModalShell({ title, onClose, children }) {
     );
 }
 
-const inputClass = 'w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm text-slate-900 outline-none focus:border-teal-400 focus:ring-2 focus:ring-teal-100';
+const inputClass = 'w-full rounded-xl border border-line px-3 py-2.5 text-sm text-ink outline-none focus:border-clay focus:ring-2 focus:ring-clay/20';
 
 function CreateModal({ onClose, onCreated }) {
     const [name, setName] = useState('');
@@ -252,17 +252,17 @@ function CreateModal({ onClose, onCreated }) {
         <ModalShell title="New file" onClose={onClose}>
             <form onSubmit={submit} className="space-y-4">
                 <div>
-                    <label className="mb-1.5 block text-xs font-medium text-slate-700">File name</label>
+                    <label className="mb-1.5 block text-xs font-medium text-ink-soft">File name</label>
                     <input autoFocus value={name} onChange={(e) => setName(e.target.value)} placeholder="solution.java" className={inputClass} />
                 </div>
                 <div>
-                    <label className="mb-1.5 block text-xs font-medium text-slate-700">Language</label>
+                    <label className="mb-1.5 block text-xs font-medium text-ink-soft">Language</label>
                     <select value={language} onChange={(e) => setLanguage(e.target.value)} className={inputClass}>
                         {LANGUAGES.map((l) => <option key={l.label} value={l.label}>{l.label}</option>)}
                     </select>
                 </div>
                 <div>
-                    <label className="mb-1.5 block text-xs font-medium text-slate-700">Visibility</label>
+                    <label className="mb-1.5 block text-xs font-medium text-ink-soft">Visibility</label>
                     <div className="flex gap-2">
                         {['PRIVATE', 'PUBLIC'].map((v) => (
                             <button
@@ -270,7 +270,7 @@ function CreateModal({ onClose, onCreated }) {
                                 key={v}
                                 onClick={() => setVisibility(v)}
                                 className={`flex flex-1 items-center justify-center gap-1.5 rounded-xl border px-3 py-2.5 text-sm font-medium transition ${
-                                    visibility === v ? 'border-teal-400 bg-teal-50 text-teal-700' : 'border-slate-200 text-slate-500 hover:bg-slate-50'
+                                    visibility === v ? 'border-clay bg-clay-soft text-clay-strong' : 'border-line text-ink-muted hover:bg-cream'
                                 }`}
                             >
                                 {v === 'PUBLIC' ? <MdPublic className="h-4 w-4" /> : <MdLock className="h-4 w-4" />}
@@ -279,7 +279,7 @@ function CreateModal({ onClose, onCreated }) {
                         ))}
                     </div>
                 </div>
-                <button disabled={busy} className="w-full rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:opacity-50">
+                <button disabled={busy} className="w-full rounded-xl bg-clay px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-clay-strong disabled:opacity-50">
                     {busy ? 'Creating…' : 'Create file'}
                 </button>
             </form>
@@ -310,7 +310,7 @@ function RenameModal({ file, onClose, onRenamed }) {
         <ModalShell title="Rename file" onClose={onClose}>
             <form onSubmit={submit} className="space-y-4">
                 <input autoFocus value={name} onChange={(e) => setName(e.target.value)} className={inputClass} />
-                <button disabled={busy} className="w-full rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:opacity-50">
+                <button disabled={busy} className="w-full rounded-xl bg-clay px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-clay-strong disabled:opacity-50">
                     {busy ? 'Saving…' : 'Save'}
                 </button>
             </form>

@@ -6,7 +6,7 @@ export default function LoginPage() {
         <AuthLayout
             breadcrumb="Sign In"
             badge="Secure OAuth login"
-            title={<>Sign in to <span className="italic text-teal-400">CodeShares</span></>}
+            title={<>Sign in to <span className="italic text-clay">CodeShare</span></>}
             description="Use your Google or GitHub account to sign in instantly. No password required — secure and fast."
             features={[
                 'One-click login with Google or GitHub',
